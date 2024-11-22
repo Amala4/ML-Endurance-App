@@ -1,0 +1,82 @@
+
+{% extends "registration/account_base.html" %}
+
+{% load static %}
+
+
+{% block content %}
+
+
+<div class="col-md-6">
+  <form method="POST" action="{% url 'user_login' %}">
+    {% csrf_token %}
+    <div class="login-form-container">
+      {% if messages %}
+      {% for message in messages %}
+      <div id="message" class="" style="text-align:center; margin: 10px; max-width: 100%; display: flex; justify-content: center;">
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+              <strong>{{ message }}</strong>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+      </div>
+      
+      {% endfor %} 
+      {% endif %}
+      <div class="content d-none d-md-block">
+        <h2>Welcome to ML Endurance!</h2>
+        <p>Please log in to access your account.</p>
+      </div>
+      <div class="content d-block d-md-none">
+        <h2>Login to your account</h2>
+        <p>Welcome back to ML Endurance Fueling!</p>
+      </div>
+
+      <div class="form-wrapper">
+        <label class="form-heading" for="">Email</label>
+        <div class="input-wrap">
+          <span class="d-block d-md-none"><img src="{% static 'assets/images/svg/email.svg' %}" alt="png-logo" /></span>
+          <input class="input-field" type="text" name="email" placeholder="Enter your email..." />
+        </div>
+      </div>
+      <div class="form-wrapper">
+        <label class="form-heading" for="">Password</label>
+        <div class="input-wrap">
+          <span class="d-block d-md-none"><img src="{% static 'assets/images/svg/password.svg' %}" alt="png-logo" /></span>
+          <input class="input-field" type="password" name="password" placeholder="Enter your password..." id="password-field" />
+          <img class="pasword-icon" src="{% static 'assets/images/svg/eye-hide.svg' %}" alt="icon" id="hide-icon"
+            onclick="togglePasswordVisibility()" />
+          <img class="pasword-icon" src="{% static 'assets/images/svg/eye.svg' %}" alt="icon" id="show-icon"
+            onclick="togglePasswordVisibility()" style="display:none;" />
+        </div>
+      </div>
+      <div class="d-flex align-items-center justify-content-between w-100 text-grey">
+
+        <a href="{% url 'password_reset' %}" style="font-weight:bolder;color:white !important;">Forgot password?</a>
+      </div>
+    
+      <div class="login-btn w-100 my-3">
+          <button class="btn-theme-dark" type="submit">
+            Log In
+          </button>
+      </div>
+
+      <div class="d-none d-md-block w-100">
+        <p>
+          Don’t have an account yet?
+          <a href="{% url 'signup' %}">Sign Up</a>
+        </p>
+      </div>
+      <div class="d-block d-md-none w-100">
+        <p>
+          No account yet?
+          <a href="{% url 'signup' %}">Sign Up</a>
+        </p>
+      </div>
+    </div>
+  </form>
+</div>
+
+{% endblock content %}
+
+
+

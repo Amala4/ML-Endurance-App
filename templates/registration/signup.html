@@ -1,0 +1,82 @@
+{% extends "registration/account_base.html" %}
+
+{% load static %}
+
+
+{% block content %}
+
+<div class="col-md-6">
+  <form method="POST" action="{% url 'signup' %}">
+    {% csrf_token %}
+    <div class="login-form-container">
+      {% if messages %}
+      {% for message in messages %}
+      <div id="message" class="" style="text-align:center; margin: 10px; max-width: 100%; display: flex; justify-content: center;">
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+              <strong>{{ message }}</strong>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+      </div>
+      
+      {% endfor %} 
+      {% endif %}
+
+      <div class="content d-none d-md-block">
+        <h2>Welcome to ML Endurance!</h2>
+        <p>Please fill in the fields to create your account.</p>
+      </div>
+      <div class="content d-block d-md-none">
+        <h2>Create your account</h2>
+        <p>Welcome to ML Endurance Fueling!</p>
+      </div>
+      <div class="form-wrapper">
+        <label class="form-heading" for="">Name</label>
+        <div class="input-wrap">
+          <span class="d-block d-md-none"><img src="{% static 'assets/images/svg/users.svg' %}" alt="png-logo" /></span>
+          <input class="input-field" type="text" name="fullname" placeholder="Enter your name..." />
+        </div>
+      </div>
+      <div class="form-wrapper">
+        <label class="form-heading" for="">Email</label>
+        <div class="input-wrap">
+          <span class="d-block d-md-none"><img src="{% static 'assets/images/svg/email.svg' %}" alt="png-logo" /></span>
+          <input class="input-field" type="text" name="email" placeholder="Enter your email..." />
+        </div>
+      </div>
+      <div class="form-wrapper">
+        <label class="form-heading" for="">Password</label>
+        <div class="input-wrap">
+          <span class="d-block d-md-none"><img src="{% static 'assets/images/svg/password.svg' %}" alt="png-logo" /></span>
+          <input class="input-field" type="password" name="password" placeholder="Enter your password..." id="password-field" />
+          <img class="pasword-icon" src="{% static 'assets/images/svg/eye-hide.svg' %}" alt="icon" id="hide-icon"
+            onclick="togglePasswordVisibility()" />
+          <img class="pasword-icon" src="{% static 'assets/images/svg/eye.svg' %}" alt="icon" id="show-icon"
+            onclick="togglePasswordVisibility()" style="display:none;" />
+        </div>
+      </div>
+      <div class="d-flex align-items-center justify-content-between w-100">
+        <span class="d-flex align-items-center check-text gap-1 text-grey">
+          <input class="color-checkbox" name="terms"  type="checkbox" />
+          I agree with the <a class="text-white" href="#">Terms of Use</a> and <a class="text-white" href="#">Privacy
+            Policy</a>
+        </span>
+      </div>
+      <div class="login-btn w-100 my-3">
+        <button class="btn-theme-dark" type="submit">
+          Sign Up
+        </button>
+      </div>
+
+      <div class="w-100">
+        <p>
+          Already have an account?
+          <a class="" href="{% url 'user_login' %}">Log In</a>
+        </p>
+      </div>
+    </div>
+  </form>
+</div>
+
+
+{% endblock content %}
+

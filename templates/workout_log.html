@@ -1,0 +1,623 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+    <!-- fuel planner detail  -->
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <div class="planner-wrapper">
+            <div class="">
+              <h1 class="main-heading">Workout Fuel Log</h1>
+            </div>
+            <div class="step-form-wrapper with-progress">
+              <!-- Step Indicators -->
+              <div class="step-indicators">
+                <ul class="step-nav">
+                  <li class="step-nav-item active" data-step="1">
+                    <span class="step-tab-count tab-1"><span>1</span></span>
+                    Workout Details
+                  </li>
+                  <span class="line-2"></span>
+                  <li class="step-nav-item" data-step="2">
+                    <span class="step-tab-count tab-2"><span>2</span></span>
+                    Fuel Log
+                  </li>
+                  <span class="line-2"></span>
+                  <li class="step-nav-item" data-step="3">
+                    <span class="step-tab-count tab-3"><span>3</span></span>
+                    Conditions
+                  </li>
+                  <span class="line-2"></span>
+                  <li class="step-nav-item" data-step="4">
+                    <span class="step-tab-count tab-4"><span>4</span></span>
+                    Fueling Issues
+                  </li>
+                </ul>
+                <ul class="step-nav p-0">
+                  <li class="step-nav-item" data-step="5">
+                    <span class="step-tab-count tab-5 d-none"
+                      ><span></span
+                    ></span>
+                  </li>
+                  <li class="step-nav-item" data-step="6">
+                    <span class="step-tab-count tab-6 d-none"
+                      ><span></span
+                    ></span>
+                  </li>
+                </ul>
+              </div>
+              <!-- for mobile  -->
+              <div class="progress-wrapper">
+                <div class="progress-container">
+                  <div class="progress-step" data-step="1"></div>
+                  <div class="progress-step" data-step="2"></div>
+                  <div class="progress-step" data-step="3"></div>
+                  <div class="progress-step" data-step="4"></div>
+                  <div class="d-none" data-step="5"></div>
+                  <div class="d-none" data-step="6"></div>
+                  <span class="step-cross">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      fill="#ffffff"
+                      class="bi bi-x-lg"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"
+                      />
+                    </svg>
+                  </span>
+                </div>
+                <p class="progress-text"></p>
+              </div>
+
+              <!-- Data temp storage -->
+              <h6 id="workout_log_url" style="display: none;" data-workout_log_url="{% url 'workout_log' %}"></h6>
+              <h6 id="chart_url" style="display: none;" data-chart_url="{% url 'chart_url' %}"></h6>
+
+              
+              <!-- Alert Message -->
+              <div id="alert-message" style="visibility: hidden; text-align: center; margin: 0px; max-width: 60%; height: 30px; background-color: #812e2e; color: #fff; border-radius: 8px; line-height: 30px; font-size: 14px; font-weight: bold; position: relative; overflow: hidden;">
+                <span id="message-text" style="display: inline;">Please fill in all the required fields.</span>
+               <button id="close-message" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #fff; font-size: 18px; font-weight: bold; cursor: pointer;">×</button>
+             </div>
+
+              <form>
+                {% csrf_token %}
+                <!-- Step 1: Workout Details -->
+                <div class="my-md-4 form-step active" data-step="1">
+                  <div class="row">
+                    <div class="col-lg-6 col-md-6">
+                      <div class="previous-form-box">
+                        <div class="previous-form-wrapper">
+                          <div class="previous-heading">
+                            <span
+                              ><img
+                                src="{% static 'assets/images/svg/previous.svg' %}"
+                                alt="img"
+                            /></span>
+                            <h3 class="prev-workout">
+                              Previously Entered Workout
+                            </h3>
+                          </div>
+                          <div class="form-data-content">
+                            <h5 class="form-data-heading">Name</h5>
+                            <h3 class="form-data-detail d-flex gap-2">
+                              {{ latest_workout.name|default:"No workout entered yet" }}
+                            </h3>
+                          </div>
+                          <div class="form-data-content">
+                            <h5 class="form-data-heading">Sport</h5>
+                            <h3 class="form-data-detail">{{ latest_workout.sport|default:"No workout entered yet" }}</h3>
+                          </div>
+                          <div class="form-data-content">
+                            <h5 class="form-data-heading">Planned Date</h5>
+                            <h3 class="form-data-detail">{{ latest_workout.planned_date|date:"F j, Y"|default:"No workout entered yet" }}</h3>
+                          </div>
+                          <div class="form-data-content">
+                            <h5 class="form-data-heading">Duration</h5>
+                            <h3 class="form-data-detail">{{ latest_workout.duration|format_duration|default:"No workout entered yet" }}</h3>
+                          </div>
+                          <div class="form-data-content">
+                            <h5 class="form-data-heading">
+                              Training Stress Score
+                            </h5>
+                            <h3 class="form-data-detail">{{ latest_workout.tss|default:"No workout entered yet" }}</h3>
+                          </div>
+                          <div class="form-data-content">
+                            <h5 class="form-data-heading">
+                              Intensity Factor
+                            </h5>
+                            <h3 class="form-data-detail">{{ latest_workout.intensity_factor|default:"No workout entered yet" }}</h3>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6">
+                      <div class="workout-form">
+                        <label class="d-md-none mt-4" for=""
+                          >Workout Details
+                        </label>
+                        <div class="form-wrapper">
+                          <label class="form-heading" for=""
+                            >Workout Date
+                          </label>
+                          <div class="input-wrap">
+                            <span>
+                              <img
+                                src="{% static 'assets/images/svg/date.svg' %}"
+                                alt="png-logo"
+                              />
+                            </span>
+                            <input
+                              class="input-field"
+                              type="text"
+                              placeholder="Date"
+                              onfocus="(this.type='date')"
+                              onblur="if(!this.value) this.type='text'"
+                              id="workout_date" 
+                              name="workout_date"
+                            />
+                          </div>
+                        </div>
+                        <div class="form-wrapper">
+                          <label class="form-heading" for=""
+                            >Duration</label
+                          >
+                          <div class="input-group">
+                            <span>
+                              <img
+                                src="{% static 'assets/images/svg/timer.svg' %}"
+                                alt="png-logo"
+                              />
+                            </span>
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control mobile-text1"
+                              aria-label="Hours"
+                              placeholder="Hours"
+                              id="duration_hours" 
+                              name="duration_hours"
+                            />
+                            <input
+                              type="number"
+                              min="0"
+                              class="form-control mobile-text2"
+                              aria-label="Minutes"
+                              placeholder="Minutes"
+                              id="duration_minutes" 
+                              name="duration_minutes"
+                            />
+                          </div>
+                        </div>
+                        <div class="form-wrapper">
+                          <label class="form-heading" for=""
+                            >Training Stress Score
+                          </label>
+                          <div class="input-wrap">
+                            <span>
+                              <img
+                                src="{% static 'assets/images/svg/training-stress.svg' %}"
+                                alt="png-logo"
+                              />
+                            </span>
+                            <input
+                              class="input-field"
+                              type="number"
+                              min="0"
+                              max="10000"
+                              placeholder="Training Stress Score"
+                              id="training_stress" 
+                              name="training_stress"
+                            />
+                          </div>
+                        </div>
+                        <div class="form-wrapper">
+                          <label class="form-heading" for=""
+                            >Enter amount of work in calories</label
+                          >
+                          <div class="input-wrap">
+                            <span>
+                              <img
+                                src="{% static 'assets/images/svg/calories.svg' %}"
+                                
+                                alt="png-logo"
+                              />
+                            </span>
+                            <input
+                              class="input-field"
+                              type="number"
+                              min="0"
+                              max="10000"
+                              placeholder="Enter calories"
+                              id="calories" 
+                              name="calories"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="w-100 d-md-flex justify-content-end">
+                    <button
+                      type="button"
+                      id="workout_log_details"
+                      class="btn-theme-dark mt-5 w-25 step-btn-next"
+                    >
+                      Continue
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Step 2: Complete Fuel Log  -->
+                <div class="form-step" data-step="2">
+                  <div class="fuel_log-wrapper">
+                    <div class="form-wrapper">
+                      <label class="d-none d-md-block" for=""
+                        >Total carbohydrates consumed
+                      </label>
+                      <label class="d-md-none d-sm-block" for=""
+                        >Carbohydrates Consumed
+                      </label>
+                      <div class="input-wrap">
+                        <input
+                          class="input-field placeholder-responsive1"
+                          type="number"
+                          min="0" 
+                          placeholder="Enter number of carbohydrates..."
+                          id="carbs_consumed" 
+                          name="carbs_consumed"
+                        />
+                      </div>
+                    </div>
+                    <div class="form-wrapper">
+                      <label class="d-none d-md-block" for=""
+                        >Volume of water (in milliliters) consumed
+                      </label>
+                      <label class="d-md-none d-sm-block" for=""
+                        >Water Consumed
+                      </label>
+                      <div class="input-wrap">
+                        <input
+                          class="input-field placeholder-responsive2"
+                          type="number"
+                          min="0" 
+                          placeholder="Enter volume of water..."
+                          id="water_consumed" 
+                          name="water_consumed"
+                        />
+                      </div>
+                    </div>
+                    <div class="form-wrapper">
+                      <label class="d-none d-md-block" for=""
+                        >Amount of sodium (in milligrams) consumed
+                      </label>
+                      <label class="d-md-none d-sm-block" for=""
+                        >Sodium Consumed
+                      </label>
+                      <div class="input-wrap">
+                        <input
+                          class="input-field placeholder-responsive3"
+                          type="number"
+                          min="0" 
+                          max="3000"
+                          placeholder="Enter amount of sodium..."
+                          id="sodium_consumed" 
+                          name="sodium_consumed"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="w-100 d-md-flex justify-content-between mt-5">
+                    <button
+                      type="button"
+                      class="btn-theme-transparent mt-2 w-25 step-btn-prev"
+                    >
+                      Back
+                    </button>
+                    <button
+                      type="button"
+                      id="workout_log_fuel"
+                      name="workout_log_fuel"
+                      class="btn-theme-dark mt-2 w-25 step-btn-next"
+                    >
+                      Continue
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Step 3: Conditions -->
+                <div class="form-step" data-step="3">
+                  <div class="row">
+                    <div class="col-12 my-md-4 my-sm-3">
+                      <label for="">Perceived Weather Conditions</label>
+                      <div class="active-radio-container">
+                        <input
+                          type="radio"
+                          id="cold"
+                          name="weather"
+                          value="cold"
+                          checked
+                        />
+                        <label class="input-field-radio" for="cold"
+                          >Cold</label
+                        >
+
+                        <input
+                          type="radio"
+                          id="cool"
+                          name="weather"
+                          value="cool"
+                        />
+                        <label class="input-field-radio" for="cool"
+                          >Cool</label
+                        >
+
+                        <input
+                          type="radio"
+                          id="warm"
+                          name="weather"
+                          value="warm"
+                        />
+                        <label class="input-field-radio" for="warm"
+                          >Warm</label
+                        >
+
+                        <input
+                          type="radio"
+                          id="hot"
+                          name="weather"
+                          value="hot"
+                        />
+                        <label class="input-field-radio" for="hot">Hot</label>
+
+                        <input
+                          type="radio"
+                          id="very_hot"
+                          name="weather"
+                          value="very_hot"
+                        />
+                        <label class="input-field-radio" for="very_hot"
+                          >Very Hot</label
+                        >
+                      </div>
+                    </div>
+
+                    <div class="col-12">
+                      <div
+                        class="d-flex align-items-center justify-content-between flex-wrap my-4"
+                      >
+                        <div class="indor-workout">
+                          <label for="">Indoor Workout</label>
+                          <p>Toggle this if the workout was done indoors.</p>
+                        </div>
+                        <div class="toggle-switch">
+                          <label class="switch">
+                            <input 
+                              type="checkbox" 
+                              id="indoor_workout"
+                              name="indoor_workout"
+                            />
+                            <span class="slider"></span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="w-100 d-md-flex justify-content-between">
+                    <button
+                      type="button"
+                      class="btn-theme-transparent mt-2 w-25 step-btn-prev"
+                    >
+                      Back
+                    </button>
+                    <button
+                      type="button"
+                      id="workout_log_conditions"
+                      class="btn-theme-dark mt-2 w-25 step-btn-next"
+                    >
+                      Continue
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Step 4: fueling Issue -->
+                <div class="form-step" data-step="4">
+                  <div class="row">
+                    <div class="col-12 my-3">
+                      <label for=""
+                        >Did you experience any gastrointestinal (GI) issues
+                        like bloating?</label
+                      >
+                      <div class="active-radio-container">
+                        <input
+                          type="radio"
+                          id="gastro-none"
+                          name="gastro"
+                          value="0"
+                        />
+                        <label class="input-field-radio" for="gastro-none"
+                          >None</label
+                        >
+
+                        <input
+                          type="radio"
+                          id="gastro-some"
+                          name="gastro"
+                          value="5"
+                        />
+                        <label class="input-field-radio" for="gastro-some"
+                          >Some</label
+                        >
+
+                        <input
+                          type="radio"
+                          id="gastro-severe"
+                          name="gastro"
+                          value="10"
+                        />
+                        <label class="input-field-radio" for="gastro-severe"
+                          >Severe</label
+                        >
+                      </div>
+                    </div>
+                    <div class="col-12 my-3">
+                      <label for=""
+                        >Did you experience any muscle cramping issues?</label
+                      >
+                      <div class="active-radio-container">
+                        <input
+                          type="radio"
+                          id="muscle-none"
+                          name="muscle"
+                          value="0"
+                        />
+                        <label class="input-field-radio" for="muscle-none"
+                          >None</label
+                        >
+
+                        <input
+                          type="radio"
+                          id="muscle-some"
+                          name="muscle"
+                          value="5"
+                        />
+                        <label class="input-field-radio" for="muscle-some"
+                          >Some</label
+                        >
+
+                        <input
+                          type="radio"
+                          id="muscle-severe"
+                          name="muscle"
+                          value="10"
+                        />
+                        <label class="input-field-radio" for="muscle-severe"
+                          >Severe</label
+                        >
+                      </div>
+                    </div>
+                    <div class="col-12 my-3">
+                      <label for=""
+                        >Did you experience any bonking (very low
+                        energy)?</label
+                      >
+                      <div class="active-radio-container">
+                        <input
+                          type="radio"
+                          id="bonking-none"
+                          name="bonking"
+                          value="0"
+                        />
+                        <label class="input-field-radio" for="bonking-none"
+                          >None</label
+                        >
+
+                        <input
+                          type="radio"
+                          id="bonking-some"
+                          name="bonking"
+                          value="5"
+                        />
+                        <label class="input-field-radio" for="bonking-some"
+                          >Some</label
+                        >
+
+                        <input
+                          type="radio"
+                          id="bonking-severe"
+                          name="bonking"
+                          value="10"
+                        />
+                        <label class="input-field-radio" for="bonking-severe"
+                          >Severe</label
+                        >
+                      </div>
+                    </div>
+                  </div>
+                  <div class="w-100 d-md-flex justify-content-between">
+                    <button
+                      type="button"
+                      class="btn-theme-transparent mt-2 w-25 step-btn-prev"
+                    >
+                      Back
+                    </button>
+                    <button
+                      type="button"
+                      id="workout_log_submit"
+                      class="btn-theme-dark mt-2 w-25 step-btn-next"
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </div>
+              </form>
+
+              <!-- Step 5: thank You page -->
+              <div class="form-step" data-step="5">
+                <div class="row">
+                  <div class="col">
+                    <div class="content-wrapper">
+                      <span class="image">
+                        <img
+                          src="{% static 'assets/images/png/thank-you.png' %}"
+                          alt="img"
+                        />
+                      </span>
+                      <div class="text-center">
+                        <h1 class="main-heading">Thank you</h1>
+                        <p class="paragraph w-75 mx-auto text-balance">
+                          Your workout fuel log was successfully submitted.
+                          Your future fueling plans will incorporate this
+                          data.
+                        </p>
+                      </div>
+                      <div class="w-100 d-md-flex justify-content-center">
+                        <button
+                          type="button"
+                          id="workout_log_thank_you"
+                          class="btn-theme-dark mt-2 w-25 step-btn-next"
+                        >
+                          Continue
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 6: summery Fuel Log -->
+              <div class="form-step" data-step="6">
+                <div class="recieved-wrapper">
+                  <div class="content">
+                    <h2>Summary</h2>
+                    <p>
+                      Visualize what you had planned versus the actual data
+                    </p>
+                  </div>
+                  <div class="recived-cards">
+                    <canvas id="myChart"></canvas>
+                  </div>
+                  
+                </div>
+                <div class="w-100 d-md-flex justify-content-end">
+                  <a href="{% url 'index' %}">
+                    <button type="button" class="btn-theme-dark mt-2 w-25">
+                    Home
+                    </button>
+                  </a>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock content %}
+

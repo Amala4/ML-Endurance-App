@@ -1,0 +1,68 @@
+/* fonts.scss */
+@font-face {
+    font-family: 'Nunito bold';
+    src: url('../fonts/Nunito-Bold.ttf') format('woff2'),
+        url('../fonts/Nunito-Bold.woff') format('woff'),
+        url('../fonts/Nunito-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Nunito extraBold';
+    src: url('../fonts/Nunito-ExtraBold.woff2') format('woff2'),
+        url('../fonts/Nunito-ExtraBold.woff') format('woff'),
+        url('../fonts/Nunito-ExtraBold.ttf') format('truetype');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'DM Sans medium';
+    src: url('../fonts/DMSans-Medium.woff2') format('woff2'),
+        url('../fonts/DMSans-Medium.woff') format('woff'),
+        url('../fonts/DMSans-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'DM Sans semiBold';
+    src: url('../fonts/DMSans-SemiBold.woff2') format('woff2'),
+        url('../fonts/DMSans-SemiBold.woff') format('woff'),
+        url('../fonts/DMSans-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'DM Sans regular';
+    src: url('../fonts/DMSans-Regular.woff2') format('woff2'),
+        url('../fonts/DMSans-Regular.woff') format('woff'),
+        url('../fonts/DMSans-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'DM Sans bold';
+    src: url('../fonts/DMSans-Bold.woff2') format('woff2'),
+        url('../fonts/DMSans-Bold.woff') format('woff'),
+        url('../fonts/DMSans-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+
+$regular: "DM Sans regular";
+$medium: "DM Sans medium";
+$semiBold: "DM Sans semiBold";
+$bold: "DM Sans bold";
+$heading-bold: "Nunito bold";
+$heading-extraBold: "Nunito extraBold";

@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+    <!-- fuel planner detail  -->
+    <div class="container">
+
+        <div class="row">
+            <div class="col">
+                <div class="contact-img">
+                    <img src="{% static 'assets/images/png/contact-img.png' %}" alt="img">
+                    
+                </div>
+                <div class="planner-wrapper">
+                    <div class="contact-heading">
+                        <h1 class="main-heading">Contact Us</h1>
+                        <p>We'd love to hear from you! Please fill out the form below, and we'll get in
+                            touch as soon as possible.</p>
+                    </div>
+                    <form class="my-4" action="{% url 'contact_us' %}" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="contact-container">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-wrapper message-field">
+                                        <label for="">Your Message</label>
+                                        <div class="input-wrap">
+                                            <span class="message-icon">
+                                                <img src="{% static 'assets/images/svg/workout.svg' %}" alt="png-logo">
+                                            </span>
+                                            <textarea class="textarea-field" rows="5" cols="40"
+                                                placeholder="Share your suggestions, support requests and other feedback"
+                                                name="message" id="message"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-wrapper contact-img-desktop">
+                                        <label for="">Upload an attachment (optional)</label>
+                                        <input type="file" name="attachment"  id="attachment" />
+                                        <span class="drag_drop">Drag and drop or browse</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 profileImgWrapper d-none">
+                                    <label for="">Upload an attachment (optional)</label>
+                                    <input type="file" name="attachment" id="attachment" class="file1"
+                                        style="visibility: hidden; height: 0; width: 0" accept="image/*">
+                                    <div class="profileImgContainer">
+                                        <div class="cameraIcon"><img class="browse1"
+                                                src="{% static 'assets/images/png/img-plus.png' %}"></div>
+
+                                        <img id="preview1" src="{% static 'assets/images/png/img-plus.png' %}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col col-md-12">
+
+                                    <div class="w-100 d-flex justify-content-end">
+                                        <button type="submit" class="btn-theme-dark mt-5 w-25 step-btn-next">
+                                            Submit
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+
+{% block js_scripts %}
+    <script>
+        $(document).on("click", ".browse1", function () {
+            var file = $(this).parents().find(".file1");
+            file.trigger("click");
+        });
+
+        $('input.file1[type="file"]').change(function (e) {
+            var fileName = e.target.files[0].name;
+            $("#file1").val(fileName);
+
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                // get loaded data and render thumbnail.
+                document.getElementById("preview1").src = e.target.result;
+            };
+            // read the image file as a data URL.
+            reader.readAsDataURL(this.files[0]);
+        });
+    </script>
+{% endblock js_scripts %}

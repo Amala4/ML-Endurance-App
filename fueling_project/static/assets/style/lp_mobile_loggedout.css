@@ -1,0 +1,49 @@
+/* Ensure the body and html don't overflow horizontally */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* Prevent content from extending outside the viewport */
+.main-content-landingpage-container {
+  height: 100vh; /* Make this container full height */
+  display: flex;
+  flex-direction: column;
+}
+.artical-height {
+  flex: 1; /* Ensure it takes the full height of its parent */
+}
+
+/* Vertically center content within the container */
+
+/* Ensure the row takes up full height of the container */
+.row {
+  height: 100%; /* Make the row take up the full height */
+  display: flex; /* Enable Flexbox for alignment */
+  align-items: center; /* Vertically center the content */
+  justify-content: center; /* Horizontally center the content */
+}
+
+.table-container {
+  display: flex;
+  justify-content: center; /* Horizontally center */
+  align-items: center; /* Vertically center */
+  height: 100vh; /* Full height of the viewport */
+}
+
+/* Ensure the image and other content scale and fit well */
+.image img {
+  max-width: 100%;
+  height: auto; /* Ensures the image scales well */
+}
+
+/* Optional: Adjustments for small devices */
+@media (max-width: 768px) {
+  .content-head {
+    padding: 10px; /* Reduce padding if necessary */
+  }
+}

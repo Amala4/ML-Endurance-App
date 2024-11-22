@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+    <!-- starter Page  -->
+    <div class="artical-height">
+      <div class="container">
+        <div class="row">
+          <div class="col view-center">
+            <div class="content-wrapper">
+              <div class="content-head d-flex flex-column gap-5">
+                <div class="image">
+                  <img src="{% static 'assets/images/png/starter-img.png' %}" alt="" />
+                </div>
+                <div class="content">
+                  <h1 class="main-heading">Hi {{ profile.name|default:" " }}!</h1>
+                  <p>What would you like to do?</p>
+                </div>
+              </div>
+              <div class="starter-btn">
+                <a href="{% url 'workout_log' %}">
+                  <button class="btn-theme-light">
+                    Enter a workout fuel log
+                  </button>
+                </a>
+
+                <a href="{% url 'fuel_planner' %}">  
+                  <button class="btn-theme-dark">
+                    Create a fueling plan
+                  </button>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock content %}
+
+
+
+   
+

@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+    <!-- fuel planner detail  -->
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <div class="planner-wrapper">
+            <div>
+              <h1 class="main-heading">Fuel Planner</h1>
+              <p class="paragraph step-paragraph active" data-step="1">
+                Enter your workout details and we’ll generate your
+                personalized fueling plan.
+              </p>
+              <p class="paragraph step-paragraph" data-step="2">
+                Your fueling plan is ready! Here are the details of your
+                plan.
+              </p>
+              <p class="paragraph step-paragraph" data-step="3">
+                Now that you have your fueling plan, you can use it for your
+                next workout.
+              </p>
+            </div>
+            <!-- Data temp storage -->
+            <h6 id="fuel_planner_url" style="display: none;" data-fuel_planner_url="{% url 'fuel_planner' %}"></h6>
+
+
+            <div class="step-form-wrapper">
+              <!-- Step Indicators -->
+              <div class="step-indicators">
+                <ul class="step-nav">
+                  <li class="step-nav-item active" data-step="1">
+                    <span class="step-tab-count tab-1"><span>1</span></span>
+                    Workout Details
+                  </li>
+                  <span class="line"></span>
+                  <li class="step-nav-item" data-step="2">
+                    <span class="step-tab-count tab-2"><span>2</span></span>
+                    Receive Plan
+                  </li>
+                  <span class="line"></span>
+                  <li class="step-nav-item" data-step="3">
+                    <span class="step-tab-count tab-3"><span>3</span></span>
+                    Complete Fuel Log Form
+                  </li>
+                </ul>
+              </div>
+              <!-- for mobile  -->
+              <div class="progress-wrapper">
+                <div class="progress-container">
+                  <div class="progress-step" data-step="1"></div>
+                  <div class="progress-step" data-step="2"></div>
+                  <div class="progress-step" data-step="3"></div>
+                  <span class="step-cross">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      fill="#ffffff"
+                      class="bi bi-x-lg"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"
+                      />
+                    </svg>
+                  </span>
+                </div>
+                <p class="progress-text">1/3</p>
+              </div>
+              
+              <!-- Alert Message -->
+              <div id="alert-message" style="visibility: hidden; text-align: center; margin: 0px; max-width: 60%; height: 30px; background-color: #812e2e; color: #fff; border-radius: 8px; line-height: 30px; font-size: 14px; font-weight: bold; position: relative; overflow: hidden;">
+                 <span id="message-text" style="display: inline;">Please fill in all the required fields.</span>
+                <button id="close-message" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #fff; font-size: 18px; font-weight: bold; cursor: pointer;">×</button>
+              </div>
+              
+        
+              <!-- Step 1: Workout Details -->
+              <form class="my-md-4 needs-validation" novalidate>
+                {% csrf_token %}
+                <div class="form-step active" data-step="1">
+                  <div class="row">
+                    <!-- Workout Name -->
+                    <div class="col-lg-6 col-md-6">
+                      <div class="form-wrapper">
+                        <label class="form-heading" for="workoutName"
+                          >Workout Name</label
+                        >
+                        <div class="input-wrap">
+                          <span
+                            ><img
+                              src="{% static 'assets/images/svg/workout.svg' %}"
+                              alt="png-logo"
+                          /></span>
+                          <input
+                            class="input-field"
+                            type="text"
+                            placeholder="Enter workout name"
+                            name="workoutName"
+                            id="workoutName"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Sport -->
+                    <div class="col-lg-6 col-md-6">
+                      <div class="form-wrapper">
+                        <label class="form-heading" for="sport"
+                          >Sport</label
+                        >
+                        <div class="input-wrap">
+                          <span
+                            ><img
+                              src="{% static 'assets/images/svg/sport.svg' %}" 
+                              alt="png-logo"
+                          /></span>
+                          <select
+                            class="input-field"
+                            name="sport"
+                            id="sport"
+                          >
+                            <option value="" selected disabled>
+                              Select sport
+                            </option>
+                            <option value="cycling">Cycling</option>
+                            <option value="mountain_biking">Mountain Biking</option>
+                            <option value="running">Running</option>
+                            <option value="xc_skiing">XC Skiing</option>
+                          </select>
+                      
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Planned Date -->
+                    <div class="col-lg-6 col-md-6">
+                      <div class="form-wrapper">
+                        <label class="form-heading" for="plannedDate"
+                          >Planned Date</label
+                        >
+                        <div class="input-wrap">
+                          <span
+                            ><img
+                              src="{% static 'assets/images/svg/date.svg' %}" 
+                              alt="png-logo"
+                          /></span>
+                          <input
+                            class="input-field"
+                            type="text"
+                            placeholder="Planned Date"
+                            onfocus="(this.type='date')"
+                            onblur="if(!this.value) this.type='text'"
+                            id="plannedDate"
+                            name="plannedDate"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6">
+                      <div class="form-wrapper">
+                        <label class="form-heading" for="">Duration</label>
+                        <div class="input-group">
+                          <span>
+                            <img
+                              src="{% static 'assets/images/svg/timer.svg' %}" 
+                              alt="png-logo"
+                            />
+                          </span>
+                          <input
+                            type="number"
+                            min="0"
+                            class="form-control Hours mobile-text1"
+                            placeholder="Hours"
+                            aria-label="Hours"
+                            id="duration_hours" 
+                            name="duration_hours"
+                          />
+                          <input
+                            type="number"
+                            min="0"
+                            class="form-control mobile-text2"
+                            placeholder="Minutes"
+                            aria-label="Minutes"
+                            id="duration_minutes" 
+                            name="duration_minutes"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Training Stress Score (Integer only) -->
+                    <div class="col-lg-6 col-md-6">
+                      <div class="form-wrapper">
+                        <label
+                          class="form-heading"
+                          for="trainingStressScore"
+                          >Training Stress Score</label
+                        >
+                        <div class="input-wrap">
+                          <span
+                            ><img
+                              src="{% static 'assets/images/svg/training-stress.svg' %}" 
+                              alt="png-logo"
+                          /></span>
+                          <input
+                            class="input-field"
+                            type="number"
+                            min="0"
+                            max="10000"
+                            placeholder="Training Stress Score"
+                            name="trainingStressScore"
+                            id="trainingStressScore"
+                            required
+                            pattern="^\d+$"
+                          />
+                          <div class="invalid-feedback">
+                            Please enter a valid integer for Training Stress
+                            Score.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Intensity Factor (Decimal only) -->
+                    <div class="col-lg-6 col-md-6">
+                      <div class="form-wrapper">
+                        <label class="form-heading" for="intensityFactor"
+                          >Intensity Factor</label
+                        >
+                        <div class="input-wrap">
+                          <span
+                            ><img
+                              src="{% static 'assets/images/svg/factor.svg' %}" 
+                              alt="png-logo"
+                          /></span>
+                          <input
+                            class="input-field"
+                            type="number"
+                            min="0"
+                            max="2"
+                            placeholder="Intensity Factor"
+                            name="intensityFactor"
+                            id="intensityFactor"
+                            required
+                            pattern="^\d+(\.\d+)?$"
+                          />
+                          <div class="invalid-feedback">
+                            Please enter a valid decimal for Intensity
+                            Factor.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="w-100 d-md-flex justify-content-end">
+                    <button
+                      id="workout_submit_btn"
+                      type="button"
+                      class="btn-theme-dark mt-5 w-25 step-btn-next"
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </div>
+              </form>
+
+              <!-- Step 2: Receive Plan -->
+              <div class="form-step" data-step="2">
+                <div class="recieved-wrapper">
+                  <div class="content">
+                    <h2>Your Fueling Plan</h2>
+                    <p>
+                      We generated a plan based on the workout details you
+                      shared
+                    </p>
+                  </div>
+                  <div class="recived-cards">
+                    <div class="card-item">
+                      <span>
+                        <img
+                          src="{% static 'assets/images/png/image-1.png' %}" 
+                          alt="img"
+                        />
+                      </span>
+                      <div class="card-item-content">
+                        <h4>Carbohydrates</h4>
+                        <span id="carbsPlan">238</span><span>g</span>
+                      </div>
+                    </div>
+                    <div class="card-item">
+                      <span>
+                        <img
+                          src="{% static 'assets/images/png/image-2.png' %}" 
+                          alt="img"
+                        />
+                      </span>
+                      <div class="card-item-content">
+                        <h4>Water</h4>
+                        <span id="waterPlan">2.1</span><span>L</span>
+                      </div>
+                    </div>
+                    <div class="card-item">
+                      <span>
+                        <img
+                          src="{% static 'assets/images/png/image-3.png' %}"
+                          alt="img"
+                        />
+                      </span>
+                      <div class="card-item-content">
+                        <h4>Sodium</h4>
+                        <span id="sodiumPlan">12</span><span>mg</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="w-100 d-md-flex justify-content-end">
+                  <button
+                    type="button"
+                    id="workout_plan_btn"
+                    class="btn-theme-dark mt-2 w-25 step-btn-next"
+                  >
+                    Continue
+                  </button>
+                </div>
+              </div>
+
+              <!-- Step 3: Complete Fuel Log -->
+              <div class="form-step" data-step="3">
+                <div class="row">
+                  <div class="col">
+                    <div class="content-wrapper">
+                      <div
+                        class="content-head d-flex align-items-center flex-column gap-5"
+                      >
+                        <div class="image">
+                          <img
+                            src="{% static 'assets/images/png/Swim-bro.png' %}" 
+                            alt="img"
+                          />
+                        </div>
+                        <div class="text-center">
+                          <h1 class="main-heading">Time to workout!</h1>
+                          <p class="paragraph w-75 mx-auto">
+                            Once you have done a workout using the fueling
+                            plan, you can complete a
+                            <a class="saperate-lint" href="{% url 'workout_log' %}"
+                              >Workout Log</a
+                            >
+                          </p>
+                        </div>
+                      </div>
+                      <div class="w-100 d-md-flex justify-content-center">
+                        <a href="{% url 'workout_log' %}">
+                          <button type="button" class="btn-theme-dark mt-2 w-25">
+                            Complete Fuel Log
+                          </button>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock content %}
