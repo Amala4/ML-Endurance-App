@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from .managers import CustomUserManager
 from django.core.validators import MaxValueValidator, MinValueValidator
+from ckeditor.fields import RichTextField
 
 GENDER_CHOICES = [
     ('male', 'Male'),
@@ -50,7 +51,6 @@ class UserProfile(models.Model):
     profile_pic = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     ftp = models.FloatField("Functional Threshold Power(Ftp)", validators=[MinValueValidator(0), MaxValueValidator(1000)], null=True, blank=True)
     weight = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(250)], null=True, blank=True)
-    age = models.PositiveIntegerField(validators=[MaxValueValidator(150)], null=True, blank=True)
     gender = models.CharField(max_length=255,choices=GENDER_CHOICES, null=True, blank=True)
     sweat_rate = models.FloatField(validators=[MinValueValidator(0.5), MaxValueValidator(4)], help_text="Sweat rate in liters per hour", null=True, blank=True)
     sweat_composition = models.PositiveIntegerField(validators=[MaxValueValidator(3000)], help_text="Sweat composition in mg of sodium per liter.", null=True, blank=True)
@@ -63,3 +63,33 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"Profile of {self.user.email}"
+
+
+
+
+class Terms(models.Model):
+    title = models.CharField(max_length=300, default="Terms and Condition", null=False, blank=False)
+    content = RichTextField(max_length=5000, null=True, blank=True )
+    date_added = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "Terms and Condition"  
+
+    def __str__(self):
+        return "Terms and Condition"
+    
+
+
+
+class Privacy(models.Model):
+    title = models.CharField(max_length=300, default="Privacy Policy", null=False, blank=False)
+    content = RichTextField(max_length=5000, null=True, blank=True )
+    date_added = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "Privacy Policy" 
+
+    def __str__(self):
+        return "Privacy Policy"

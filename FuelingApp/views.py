@@ -1,21 +1,18 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.conf import settings
-from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
-from datetime import datetime
+from django.db import transaction
 import random
 import json
 from dateutil.parser import parse
+from UserApp.models import UserProfile
 from .models import (
     Support,
     Workout,
-    # CyclingWorkoutDetails,
     WorkoutLog,
-    # CyclingWorkoutLog,
     WorkoutFuelLog,
     WorkoutCondition,
     FuelingIssue,
@@ -68,36 +65,37 @@ def fuel_planner(request):
 
             # Sports
             if sport and (not sport in dict(SPORTS_CHOICES)):
-                return JsonResponse({'error': 'Invalid Sports Choice'}, status=400)
+                return JsonResponse({'error': 'Invalid Sports Choice'}, status=200)
 
 
             # Planned Date
             if not planned_date_str:
-                return JsonResponse({'error': 'Workout Planned date is required'}, status=400)
+                return JsonResponse({'error': 'Workout Planned date is required'}, status=200)
             try:
                 planned_date = parse(planned_date_str).strftime("%Y-%m-%d")
             except (ValueError, TypeError):
-                return JsonResponse({'error': 'Invalid date format'}, status=400)
+                return JsonResponse({'error': 'Invalid date format'}, status=200)
 
 
             # Duration
             try:
                 duration = (duration_hours * 60) + duration_minutes
             except ValueError:
-                return JsonResponse({'error': 'Invalid format for duration'}, status=400)
-            
+                return JsonResponse({'error': 'Invalid format for duration'}, status=200)
+
 
             # Training Stress
-            if (not training_stress) or (int(training_stress) > 10000): 
-                return JsonResponse({'error': 'Training stress score must be a number less than 10,000'}, status=400)
-            training_stress = int(training_stress)
+            if training_stress and (int(training_stress) > 10000):
+                return JsonResponse({'error': 'Training stress score must be a number less than 10,000'}, status=200)
+
+            training_stress = int(training_stress) if training_stress else None
 
 
             # Intensity Factor
-            if (not intensity_factor) or (float(intensity_factor) > 2): 
-                return JsonResponse({'error': 'Intensity Factor must be a number less than 2'}, status=400)
-            intensity_factor = float(intensity_factor)
-        
+            if intensity_factor and (float(intensity_factor) > 2):
+                return JsonResponse({'error': 'Intensity Factor must be a number less than 2'}, status=200)
+            intensity_factor = float(intensity_factor) if intensity_factor else None
+
 
 
             # Save workout data
@@ -113,7 +111,7 @@ def fuel_planner(request):
 
             # Get Fuel Plan
             fuel_plan = calculate_fuel_plan(workout)
-            
+
             fueling_plan = FuelingPlan(
                 workout=workout,
                 water=fuel_plan["water"],
@@ -124,9 +122,21 @@ def fuel_planner(request):
             workout.save()
             fueling_plan.save()
 
+            #Check if user prefers metric unit
+            user_profile = UserProfile.objects.filter(user=request.user).first()
+            prefers_metric = user_profile.metrics_unit
+
+            if prefers_metric:
+                water_unit = "ml"
+                water_volume = fuel_plan["water"]
+            else:
+                water_unit = "oz"
+                water_volume = round(fuel_plan["water"] / 29.5735, 2)
+
             fueling_requirements = {
                 'carbohydrate': fuel_plan["carbs"],
-                'water': fuel_plan["water"],
+                'water': water_volume,
+                'water_unit': water_unit,
                 'sodium': fuel_plan["sodium"],
             }
 
@@ -134,14 +144,14 @@ def fuel_planner(request):
                 'success': 'Workout logged successfully',
                 'fueling_requirements': fueling_requirements
             }, status=200)
-            
+
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
     try:
         profile = request.user.profile
     except:
-        profile = None    
+        profile = None
     context = {
         'profile': profile,
     }
@@ -156,13 +166,19 @@ def workout_log(request):
     latest_workout = Workout.objects.filter(user=request.user).order_by('-date_added').first()
     try:
         profile = request.user.profile
+        if profile.metrics_unit:
+            water_unit = "milliliters"
+        else:
+            water_unit = "ounces"
     except:
-        profile = None   
+        profile = None
+        water_unit = "milliliters"
 
     if request.method == "GET":
         context = {
             'latest_workout': latest_workout,
             'profile': profile,
+            'water_unit': water_unit,
         }
         return render(request, 'workout_log.html', context)
 
@@ -192,106 +208,115 @@ def workout_log(request):
             bonking_issue = int(data.get('bonking', 0) or 0)
 
 
-
-            # Workout Date
-            if not workout_date_str:
-                return JsonResponse({'error': 'Workout date is required'}, status=400)
-            try:
-                workout_date = parse(workout_date_str).strftime("%Y-%m-%d")
-            except (ValueError, TypeError):
-                return JsonResponse({'error': 'Invalid date format'}, status=400)
-
-
-            # Duration
-            try:
-                duration = (duration_hours * 60) + duration_minutes
-            except ValueError:
-                return JsonResponse({'error': 'Invalid format for duration'}, status=400)
-            
-
-            # Training Stress
-            if training_stress:
-                if  int(training_stress) > 10000: 
-                    return JsonResponse({'error': 'Training stress score must be a number less than 10,000'}, status=400)
-            training_stress = int(training_stress) if training_stress else None
+            with transaction.atomic():
+                # Workout Date
+                if not workout_date_str:
+                    return JsonResponse({'error': 'Workout date is required'}, status=200)
+                try:
+                    workout_date = parse(workout_date_str).strftime("%Y-%m-%d")
+                except (ValueError, TypeError):
+                    return JsonResponse({'error': 'Invalid date format'}, status=200)
 
 
-            # Calories
-            if calories:
-                if float(calories) > 10000: 
-                    return JsonResponse({'error': 'Calories must be a number less than 10,000'}, status=400)
-            calories = float(calories) if calories else None
-
-    
-            # Carbs Consumed
-            carbs_consumed = float(carbs_consumed) if carbs_consumed else None
-
-            # Water Consumed
-            water_consumed = float(water_consumed) if water_consumed else None 
+                # Duration
+                try:
+                    duration = (duration_hours * 60) + duration_minutes
+                except ValueError:
+                    return JsonResponse({'error': 'Invalid format for duration'}, status=200)
 
 
-            # Sodium Consumed
-            if sodium_consumed:
-                if float(sodium_consumed) > 3000: 
-                    return JsonResponse({'error': 'Sodium consumed must be a number less than 3,000'}, status=400)
-            sodium_consumed = float(sodium_consumed) if sodium_consumed else None
+                # Training Stress
+                if training_stress:
+                    if  int(training_stress) > 10000:
+                        return JsonResponse({'error': 'Training stress score must be a number less than 10,000'}, status=200)
+                training_stress = int(training_stress) if training_stress else None
 
 
-            # Weather Condition
-            if not weather_condition in dict(WEATHER_CONDITION_CHOICES):
-                return JsonResponse({'error': 'Invalid weather condition'}, status=400)
+                # Calories
+                if calories:
+                    if float(calories) > 10000:
+                        return JsonResponse({'error': 'Calories must be a number less than 10,000'}, status=200)
+                calories = float(calories) if calories else None
 
 
-            # Gastro Issue
-            if not gastro_issue in dict(ISSUES_CHOICES):
-                return JsonResponse({'error': 'Invalid Gastro Issue Choice'}, status=400)
+                # Carbs Consumed
+                carbs_consumed = float(carbs_consumed) if carbs_consumed else None
+
+                # Water Consumed
+                profile = request.user.profile
+                if profile.metrics_unit:
+                    water_consumed = float(water_consumed) if water_consumed else None
+                else:
+                    water_consumed = round(float(water_consumed) * 29.5735, 2) if water_consumed else None
+
+                # Sodium Consumed
+                if sodium_consumed:
+                    if float(sodium_consumed) > 3000:
+                        return JsonResponse({'error': 'Sodium consumed must be a number less than 3,000'}, status=200)
+                sodium_consumed = float(sodium_consumed) if sodium_consumed else None
 
 
-            # Muscle Cramp
-            if not muscle_cramp in dict(ISSUES_CHOICES):
-                return JsonResponse({'error': 'Invalid Muscle Cramp Choice'}, status=400)
+                # Weather Condition
+                if not weather_condition in dict(WEATHER_CONDITION_CHOICES):
+                    return JsonResponse({'error': 'Invalid weather condition'}, status=200)
 
 
-            # Gastro Issue
-            if not bonking_issue in dict(ISSUES_CHOICES):
-                return JsonResponse({'error': 'Invalid Bonking Choice'}, status=400)
+                # Gastro Issue
+                if not gastro_issue in dict(ISSUES_CHOICES):
+                    return JsonResponse({'error': 'Invalid Gastro Issue Choice'}, status=200)
 
 
-            
+                # Muscle Cramp
+                if not muscle_cramp in dict(ISSUES_CHOICES):
+                    return JsonResponse({'error': 'Invalid Muscle Cramp Choice'}, status=200)
 
-            # Save workout log data
-            workout_log = WorkoutLog.objects.create(
-                workout=latest_workout,
-                duration=duration,
-                tss=training_stress,
-                calories=calories,
-                date=workout_date,
-            )
 
-            # Save workout fuel log data
-            WorkoutFuelLog.objects.create(
-                workout_log=workout_log,
-                water=water_consumed,
-                sodium=sodium_consumed,
-                carbs=carbs_consumed,
-            )
+                # Gastro Issue
+                if not bonking_issue in dict(ISSUES_CHOICES):
+                    return JsonResponse({'error': 'Invalid Bonking Choice'}, status=200)
 
-            # Save workout conditions
-            WorkoutCondition.objects.create(
-                workout_log=workout_log,
-                weather_condition=weather_condition,
-                isIndoors=indoor_workout,
-            )
 
-            # Save workout fueling issues
-            FuelingIssue.objects.create(
-                workout_log=workout_log,
-                bloating_gi=gastro_issue,
-                cramping=muscle_cramp,
-                bonking=bonking_issue,
-            )
+                # Save or update WorkoutLog
+                workout_log, created = WorkoutLog.objects.update_or_create(
+                    workout=latest_workout,
+                    defaults={
+                        'duration': duration,
+                        'tss': training_stress,
+                        'calories': calories,
+                        'date': workout_date,
+                    }
+                )
 
-            return JsonResponse({'success': 'Workout logged successfully'}, status=200)
+                # Save or update WorkoutFuelLog
+                WorkoutFuelLog.objects.update_or_create(
+                    workout_log=workout_log,
+                    defaults={
+                        'water': water_consumed,
+                        'sodium': sodium_consumed,
+                        'carbs': carbs_consumed,
+                    }
+                )
+
+                # Save or update WorkoutCondition
+                WorkoutCondition.objects.update_or_create(
+                    workout_log=workout_log,
+                    defaults={
+                        'weather_condition': weather_condition,
+                        'isIndoors': indoor_workout,
+                    }
+                )
+
+                # Save or update FuelingIssue
+                FuelingIssue.objects.update_or_create(
+                    workout_log=workout_log,
+                    defaults={
+                        'bloating_gi': gastro_issue,
+                        'cramping': muscle_cramp,
+                        'bonking': bonking_issue,
+                    }
+                )
+
+                return JsonResponse({'success': 'Workout logged successfully'}, status=200)
 
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
@@ -300,9 +325,22 @@ def workout_log(request):
 
 
 @login_required
+def check_workout_log(request):
+    latest_workout = Workout.objects.filter(user=request.user).order_by('-date_added').first()
+    existing_workout_log = WorkoutLog.objects.filter(workout=latest_workout).first()
+
+    if existing_workout_log:
+        return JsonResponse({'exists': True}, status=200)
+    else:
+        return JsonResponse({'exists': False}, status=200)
+
+
+
+
+@login_required
 def contact_us(request):
     if request.method == 'POST':
-        message = request.POST.get('message')  
+        message = request.POST.get('message')
         attachment = request.FILES.get('attachment')
 
         if not message:
@@ -310,13 +348,13 @@ def contact_us(request):
             return render(request, 'contact.html')
 
         if attachment:
-            max_size = 50 * 1024 * 1024  
+            max_size = 50 * 1024 * 1024
             if attachment.size > max_size:
                 messages.error(request, 'The file size exceeds the 50MB limit.')
                 return render(request, 'contact.html')
 
         Support.objects.create(
-            user=request.user, 
+            user=request.user,
             message=message,
             attachment=attachment,
         )
@@ -325,7 +363,7 @@ def contact_us(request):
             'New Support Message',
             f'You have a new support message from {request.user.email}: Login to your admin page to View message',
             sender_email,
-            [admin_email], 
+            [admin_email],
             fail_silently=False,
         )
 
@@ -334,7 +372,7 @@ def contact_us(request):
     try:
         profile = request.user.profile
     except:
-        profile = None   
+        profile = None
     context = {
         'profile': profile,
     }
@@ -356,21 +394,48 @@ def notifications(request):
 
 @login_required
 def get_chart_data(request):
+    try:
+        profile = request.user.profile
+    except UserProfile.DoesNotExist:
+        return JsonResponse({'error': 'No profile found for this user'}, status=404)
+
+
+    # Planned
     latest_workout = Workout.objects.filter(user=request.user).order_by('-date_added').first()
-    
     if not latest_workout:
         return JsonResponse({'error': 'No workout found for this user'}, status=404)
-
     latest_workout_fuel_plan = get_object_or_404(FuelingPlan, workout=latest_workout)
+
+
+    # Actual
     latest_workout_log = get_object_or_404(WorkoutLog, workout=latest_workout)
     latest_workout_fuel_log = get_object_or_404(WorkoutFuelLog, workout_log=latest_workout_log)
 
+    if profile.metrics_unit:
+        is_metric = True
+        planned_water_consumption =latest_workout_fuel_plan.water
+        actual_water_consumption =latest_workout_fuel_log.water
+    else:
+        is_metric = False
+        planned_water_consumption = round(latest_workout_fuel_plan.water / 29.5735, 2)
+        actual_water_consumption =round(latest_workout_fuel_log.water / 29.5735, 2)
+
+    if latest_workout.sport in ['cycling', 'mountain_biking']:
+        labels = ['TSS', 'Carbs', 'Water', 'Sodium']
+        planned_data = [latest_workout.tss, latest_workout_fuel_plan.carbs, planned_water_consumption, latest_workout_fuel_plan.sodium]
+        actual_data = [latest_workout_log.tss, latest_workout_fuel_log.carbs, actual_water_consumption, latest_workout_fuel_log.sodium]
+    else:
+        labels = ['Carbs', 'Water', 'Sodium']
+        planned_data = [latest_workout_fuel_plan.carbs, planned_water_consumption, latest_workout_fuel_plan.sodium]
+        actual_data = [latest_workout_fuel_log.carbs, actual_water_consumption, latest_workout_fuel_log.sodium]
+
+
     chart_data = {
-        'labels': ['TSS', 'Carbs', 'Water', 'Sodium'],
+        'labels': labels,
         'datasets': [
             {
                 'label': 'Planned',
-                'data': [latest_workout.tss, latest_workout_fuel_plan.carbs, latest_workout_fuel_plan.water, latest_workout_fuel_plan.sodium],
+                'data': planned_data,
                 'backgroundColor': '#2F388D',
                 'barPercentage': 0.5,
                 'categoryPercentage': 0.4,
@@ -378,7 +443,7 @@ def get_chart_data(request):
             },
             {
                 'label': 'Actual',
-                'data': [latest_workout_log.tss, latest_workout_fuel_log.carbs, latest_workout_fuel_log.water, latest_workout_fuel_log.sodium],
+                'data': actual_data,
                 'backgroundColor': '#7983D9',
                 'barPercentage': 0.5,
                 'categoryPercentage': 0.4,
@@ -389,7 +454,8 @@ def get_chart_data(request):
 
     return JsonResponse({
         'success': 'Data Loaded successfully',
-        'chart_data': chart_data
+        'chart_data': chart_data,
+        'is_metric': is_metric
     })
 
 

@@ -6,7 +6,7 @@
 {% block content %}
 
 <div class="col-md-6">
-  <form method="POST" action="{% url 'signup' %}">
+  <form method="POST" action="{% url 'signup' %}" id="signup-form">
     {% csrf_token %}
     <div class="login-form-container">
       {% if messages %}
@@ -29,6 +29,12 @@
         <h2>Create your account</h2>
         <p>Welcome to ML Endurance Fueling!</p>
       </div>
+
+      <!-- Alert Message -->
+      <div id="alert-message" style="display:none; text-align: center; padding:5px; margin: 0px; min-width: 80%; background-color: #812e2e; color: #fff; border-radius: 8px; line-height: 30px; font-size: 14px; font-weight: bold; position: relative;">
+        <span id="message-text" style="display: inline;"></span>
+      </div>
+
       <div class="form-wrapper">
         <label class="form-heading" for="">Name</label>
         <div class="input-wrap">
@@ -57,7 +63,7 @@
       <div class="d-flex align-items-center justify-content-between w-100">
         <span class="d-flex align-items-center check-text gap-1 text-grey">
           <input class="color-checkbox" name="terms"  type="checkbox" />
-          I agree with the <a class="text-white" href="#">Terms of Use</a> and <a class="text-white" href="#">Privacy
+          I agree with the <a class="text-white" href="{% url 'terms_and_condition' %}" target="_blank">Terms of Use</a> and <a class="text-white" href="{% url 'privacy_policy' %}" target="_blank">Privacy
             Policy</a>
         </span>
       </div>

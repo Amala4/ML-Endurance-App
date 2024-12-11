@@ -217,7 +217,7 @@ a:hover {
   margin: 10px 0;
   transition: all 0.4s ease-in-out;
 }
-.btn-theme-light:hover {
+.btn-theme-light:hover, .btn-theme-pics:hover {
   background: transparent;
   outline: 1px solid #2f388d;
 }
@@ -524,6 +524,8 @@ a:hover {
   font-family: "DM Sans";
   font-size: 14px;
   font-weight: 500;
+  word-break: break-word; /* new addition */
+
 }
 .sidebar
   .sidebar-nav
@@ -535,6 +537,7 @@ a:hover {
   font-family: "DM Sans";
   font-size: 14px;
   font-weight: 400;
+  word-break: break-word; /* new addition */
 }
 .sidebar .sidebar-nav ul.main-category-menu ul.subNavList {
   padding-left: 50px;
@@ -734,6 +737,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   position: absolute;
   left: 15px;
   cursor: pointer;
+  padding: 200px;
 }
 
 .fuel_log-wrapper .form-wrapper .input-wrap .input-field {
@@ -1020,6 +1024,7 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   border-radius: 25px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: normal; /*new addition*/
 }
 .active-radio-container > .input-field-radio:hover {
   background: #2f388d;
@@ -1027,8 +1032,9 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 .active-radio-container input[type="radio"]:checked + .input-field-radio {
   background: #2f388d;
-  border: 1px solid transparent;
+  /*border: 1px solid transparent;*/ /*new addition*/
   color: rgb(255, 255, 255);
+  font-weight: bold; /*new addition*/
 }
 
 /********************************* switch btn ********************************/
@@ -1262,7 +1268,7 @@ footer span {
 
 .custom-file-upload {
   position: relative;
-  overflow: hidden;
+  /* overflow: hidden; */
   display: inline-block;
 }
 
@@ -1274,6 +1280,8 @@ footer span {
   opacity: 0;
   filter: alpha(opacity=0);
   cursor: pointer;
+  pointer-events: none; /* new addition*/
+
 }
 
 /* ----------responsive  -------------- */
@@ -1386,114 +1394,114 @@ footer span {
     padding: 15px 15px;
   }
 }
-@media (min-width: 768px) and (max-width: 992px) {
-  body {
-    background-color: #2f388d;
-  }
-  .body-set {
-    background-color: #191a1f;
-  }
-  .login-side-content {
-    width: 100%;
-  }
-  .login-side-content h1 {
-    font-size: 20px;
-  }
-  .login-form-container {
-    padding: 40px 10px;
-  }
-  .login-form-container h2 {
-    font-size: 20px;
-  }
-  .login-form-container .check-text {
-    font-size: 13px;
-  }
-  .login-form-container .btn-container {
-    flex-wrap: wrap;
-  }
-  .btn-theme-auth {
-    padding: 15px 15px;
-  }
-  .artical-height {
-    height: 100%;
-  }
-  .planner-wrapper {
-    width: 95%;
-  }
-  .form-step.active {
-    height: calc(100vh - 350px);
-  }
-  .form-step.active .content-wrapper {
-    height: calc(100vh - 350px);
-  }
-  .with-progress .form-step.active {
-    height: calc(100vh - 320px);
-  }
-  .sidebar {
-    width: 70px;
-    min-width: 70px;
-    overflow: hidden;
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    padding: 0 10px !important;
-    transition: all 0.4s ease-in-out;
-  }
-  .sidebar ~ .main-content-container {
-    padding: 50px 0;
-    margin: 10px 10px 10px 70px;
-    border-radius: 15px;
-  }
-  .sidebar .sidebar-list a span.menu-name {
-    opacity: 0;
-    visibility: hidden;
-  }
-  .sidebar .row-logo {
-    padding-left: 0;
-    justify-content: center;
-  }
-  .sidebar .row-logo a.logoPrimary {
-    display: none;
-    overflow: hidden;
-  }
-  .sidebar .row-logo a.logoIcon {
-    display: block;
-    overflow: hidden;
-  }
-  .sidebar .row-logo .main-name {
-    display: none;
-  }
-  .sidebar .sidebar-nav ul {
-    padding-right: 0;
-    padding-left: 5px;
-  }
-  .sidebar li.subNav > a::after {
-    display: none;
-  }
-  .sidebar li.profile-card {
-    padding-right: 5px !important;
-    padding-left: 0px !important;
-    background-color: transparent !important;
-  }
-  .sidebar .submenu.show {
-    display: none;
-  }
-  .sidebar:hover .submenu.show {
-    display: block;
-  }
-  .step-nav .line {
-    width: 65px;
-  }
-  .step-nav .line-2 {
-    width: 40px;
-  }
-  .recieved-wrapper .recived-cards .card-item {
-    width: 180px;
-    height: 230px;
-  }
-}
-@media (max-width: 767px) {
+/*@media (min-width: 768px) and (max-width: 992px) {*/
+/*  body {*/
+/*    background-color: #2f388d;*/
+/*  }*/
+/*  .body-set {*/
+/*    background-color: #191a1f;*/
+/*  }*/
+/*  .login-side-content {*/
+/*    width: 100%;*/
+/*  }*/
+/*  .login-side-content h1 {*/
+/*    font-size: 20px;*/
+/*  }*/
+/*  .login-form-container {*/
+/*    padding: 40px 10px;*/
+/*  }*/
+/*  .login-form-container h2 {*/
+/*    font-size: 20px;*/
+/*  }*/
+/*  .login-form-container .check-text {*/
+/*    font-size: 13px;*/
+/*  }*/
+/*  .login-form-container .btn-container {*/
+/*    flex-wrap: wrap;*/
+/*  }*/
+/*  .btn-theme-auth {*/
+/*    padding: 15px 15px;*/
+/*  }*/
+/*  .artical-height {*/
+/*    height: 100%;*/
+/*  }*/
+/*  .planner-wrapper {*/
+/*    width: 95%;*/
+/*  }*/
+/*  .form-step.active {*/
+/*    height: calc(100vh - 350px);*/
+/*  }*/
+/*  .form-step.active .content-wrapper {*/
+/*    height: calc(100vh - 350px);*/
+/*  }*/
+/*  .with-progress .form-step.active {*/
+/*    height: calc(100vh - 320px);*/
+/*  }*/
+/*  .sidebar {*/
+/*    width: 70px;*/
+/*    min-width: 70px;*/
+/*    overflow: hidden;*/
+/*    position: fixed;*/
+/*    top: 0;*/
+/*    left: 0;*/
+/*    bottom: 0;*/
+/*    padding: 0 10px !important;*/
+/*    transition: all 0.4s ease-in-out;*/
+/*  }*/
+/*  .sidebar ~ .main-content-container {*/
+/*    padding: 50px 0;*/
+/*    margin: 10px 10px 10px 70px;*/
+/*    border-radius: 15px;*/
+/*  }*/
+/*  .sidebar .sidebar-list a span.menu-name {*/
+/*    opacity: 0;*/
+/*    visibility: hidden;*/
+/*  }*/
+/*  .sidebar .row-logo {*/
+/*    padding-left: 0;*/
+/*    justify-content: center;*/
+/*  }*/
+/*  .sidebar .row-logo a.logoPrimary {*/
+/*    display: none;*/
+/*    overflow: hidden;*/
+/*  }*/
+/*  .sidebar .row-logo a.logoIcon {*/
+/*    display: block;*/
+/*    overflow: hidden;*/
+/*  }*/
+/*  .sidebar .row-logo .main-name {*/
+/*    display: none;*/
+/*  }*/
+/*  .sidebar .sidebar-nav ul {*/
+/*    padding-right: 0;*/
+/*    padding-left: 5px;*/
+/*  }*/
+/*  .sidebar li.subNav > a::after {*/
+/*    display: none;*/
+/*  }*/
+/*  .sidebar li.profile-card {*/
+/*    padding-right: 5px !important;*/
+/*    padding-left: 0px !important;*/
+/*    background-color: transparent !important;*/
+/*  }*/
+/*  .sidebar .submenu.show {*/
+/*    display: none;*/
+/*  }*/
+/*  .sidebar:hover .submenu.show {*/
+/*    display: block;*/
+/*  }*/
+/*  .step-nav .line {*/
+/*    width: 65px;*/
+/*  }*/
+/*  .step-nav .line-2 {*/
+/*    width: 40px;*/
+/*  }*/
+/*  .recieved-wrapper .recived-cards .card-item {*/
+/*    width: 180px;*/
+/*    height: 230px;*/
+/*  }*/
+/*}*/
+@media (max-width: 992px) {
   h1 {
     color: rgb(255, 255, 255);
     font-family: "Nunito";
@@ -1655,13 +1663,13 @@ footer span {
   .previous-form-box > .previous-form-wrapper .form-data-content {
     width: 210px;
   }
-  .contact-img {
-    display: block;
-    margin: 15px 0;
-  }
-  .contact-img img {
-    border-radius: 25px;
-  }
+  /*.contact-img {*/ /*new addition*/
+  /*  display: block;*/
+  /*  margin: 15px 0;*/
+  /*}*/
+  /*.contact-img img {*/
+  /*  border-radius: 25px;*/
+  /*}*/
   .contact-heading p {
     display: none;
   }
@@ -1791,11 +1799,19 @@ footer span {
       margin-top: 0px !important;
       margin-bottom: 0px !important;
   }
-  
+
 
 
 }
 @media (max-width: 576px) {
+
+  .contact-img {       /*new addition*/
+    display: block;
+    margin: 15px 0;
+  }
+  .contact-img img {     /*new addition*/
+    border-radius: 25px;
+  }
   .artical-height {
     margin-top: 100px;
   }
@@ -1828,7 +1844,7 @@ footer span {
 
   .profile_image img{
     width: 40%;
-  
+
   }
 }
 @media (max-width: 431px) {

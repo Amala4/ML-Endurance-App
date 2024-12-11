@@ -8,6 +8,8 @@ from .forms import AdminUserCreationForm, AdminUserChangeForm
 from .models import (
     CustomUser,
     UserProfile,
+    Terms,
+    Privacy
 )
 admin.site.unregister(Group)
 
@@ -31,6 +33,8 @@ class ModelSortingAdminSite(admin.AdminSite):
         ordering2 = {
             "CustomUser": 1,
             "UserProfile": 2,
+            "Terms": 3,
+            "Privacy": 4,
         }
 
 
@@ -103,3 +107,33 @@ class UserProfileAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 admin.site.register(UserProfile, UserProfileAdmin)
+
+
+
+
+# Terms and Condition admin setup
+class TermsAdmin(admin.ModelAdmin):
+    list_display = ['title', ]
+    list_display_links = ['title',]
+    readonly_fields = ['date_added', 'last_updated','title']
+
+    def has_add_permission(self, request):
+        return False
+    def has_delete_permission(self, request, obj=None):
+        return False
+admin.site.register(Terms, TermsAdmin)
+
+
+
+
+# Privacy Policy admin setup
+class PrivacyAdmin(admin.ModelAdmin):
+    list_display = ['title', ]
+    list_display_links = ['title',]
+    readonly_fields = ['date_added', 'last_updated','title']
+    
+    def has_add_permission(self, request):
+        return False
+    def has_delete_permission(self, request, obj=None):
+        return False
+admin.site.register(Privacy, PrivacyAdmin)

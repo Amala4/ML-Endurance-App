@@ -1,6 +1,6 @@
 from . import views
 from django.urls import path, include
-from django.contrib.auth.views import PasswordChangeDoneView,PasswordChangeView
+from django.contrib.auth.views import PasswordChangeView
 
 
 
@@ -20,7 +20,8 @@ urlpatterns = [
 
   
 
-    #Contact Us
-    # path('make-inquiry/', views.Make_Inquiry, name='make_inquiry'),
+    #Legal
+    path('terms-and-condition/', views.terms_and_condition, name='terms_and_condition'),
+    path('privacy-policy/', views.privacy_policy, name='privacy_policy'),
 
 ]

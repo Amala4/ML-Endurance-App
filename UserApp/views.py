@@ -1,17 +1,18 @@
-from django.contrib.auth.forms import PasswordResetForm
-from django.contrib.auth.views import PasswordResetView
 from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth import authenticate, get_user_model
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from PIL import Image, ImageOps
 from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from dateutil.parser import parse
+from datetime import datetime, timedelta
 
 from .models import (
     UserProfile,
+    Privacy,
+    Terms,
     GENDER_CHOICES
 )
 
@@ -88,6 +89,7 @@ def profile(request):
         user_weight = profile.weight
         if user_weight:
             if profile.metrics_unit:
+                user_weight = round(user_weight, 1)
                 user_weight = f"{user_weight}kg"
             else:
                 imperial_weight = round(user_weight * 2.20462, 1)
@@ -142,11 +144,21 @@ def profile(request):
         # Birth Date
         if birth_date:
             try:
-                birth_date = parse(birth_date).strftime("%Y-%m-%d")
+                birth_date_obj = parse(birth_date).date()
+                today = datetime.today().date()
+                min_allowed_date = today - timedelta(days=12 * 365)
+
+                if birth_date_obj > today:
+                    messages.error(request, 'Birthdate cannot be in the future')
+                    return render(request, 'profile.html', context)
+                if birth_date_obj > min_allowed_date:
+                    messages.error(request, 'Users must be at least 12 years old')
+                    return render(request, 'profile.html', context)
+
+                profile.birth_date = birth_date_obj.strftime("%Y-%m-%d")
             except (ValueError, TypeError):
                 messages.error(request, 'Invalid Date Format')
                 return render(request, 'profile.html', context)
-            profile.birth_date = birth_date
 
 
         # Gender
@@ -181,7 +193,8 @@ def profile(request):
                 if not (0 <= weight <= 550):
                     messages.error(request, 'Invalid Weight figure, max is 550lb')
                     return render(request, 'profile.html', context)
-                weight = weight/2.20462
+
+                weight = round(weight/2.20462, 1)
             profile.weight = weight
 
 
@@ -210,12 +223,31 @@ def profile(request):
 def delete_account(request):
     if request.method == "POST":
         user = request.user
-        # user.delete() 
-        # auth.logout(request)  
+        user.delete() 
+        auth.logout(request)  
         messages.success(request, "Your account has been deleted successfully.")
         return redirect("user_login") 
     
     return redirect("profile")
+
+
+
+def terms_and_condition(request):
+    terms_n_condition = Terms.objects.first()
+    context = {
+        'content': terms_n_condition.content,
+    } 
+    return render(request, 'terms.html', context)
+
+
+
+
+def privacy_policy(request):
+    privacy_policy = Privacy.objects.first()
+    context = {
+        'content': privacy_policy.content,
+    } 
+    return render(request, 'privacy_policy.html', context)
 
 
 

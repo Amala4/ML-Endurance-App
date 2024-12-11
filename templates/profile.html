@@ -16,20 +16,24 @@
                             <div class="row">
                                 <div class="row col-12 justify-content-between align-items-center pe-0">
                                     <div class="col-md-2 col-lg-3 col-12 profile_image">
-                                        <img 
-                                        src="{% if profile.profile_pic %}{{ profile.profile_pic.url }}{% else %}{% static 'assets/images/png/default_profile.png' %}{% endif %}" 
-                                        class="img-fluid rounded-circle"/>
+                                        <img
+                                        src="{% if profile.profile_pic %}{{ profile.profile_pic.url }}{% else %}{% static 'assets/images/png/default_profile.png' %}{% endif %}"
+                                        class="img-fluid rounded-circle"
+                                        id="profile-image-placeholder"
+                                        />
                                     </div>
+
                                     <div class="col-12 col-md-9 col-lg-7 d-flex flex-md-wrap gap-md-2 justify-content-between pe-0">
                                         <div class="custom-file-upload">
-                                            <button class="btn btn-theme-pics" type="button">
-                                                Choose File
-                                            </button>
-                                            <input type="file" id="file-upload" class="w-25" name="profile_pic" accept="image/*"/>
+                                          <button type="button" class="btn-theme-pics" onclick="document.getElementById('file-upload').click()">
+                                            Choose File
+                                          </button>
+                                            <input type="file" id="file-upload" class="w-25" name="profile_pic" accept="image/*" onchange="previewImage(event)"/>
                                         </div>
-                                        <button type="submit" class="btn-theme-pics mx-0 w-sm-25 step-btn-next">
-                                            Update
+                                        <button type="submit" class="btn-theme-pics mx-0 w-sm-25">
+                                          Update
                                         </button>
+
                                     </div>
                                 </div>
 
@@ -40,7 +44,7 @@
                                             <span>
                                                 <img src="{% static 'assets/images/svg/users.svg' %}" alt="png-logo"/>
                                             </span>
-                                            <input class="input-field" type="text" id="name" placeholder="{{ profile.name }}" name="name" />
+                                            <input class="input-field" type="text" id="name" placeholder="{{ profile.name|default:'' }}" name="name" />
                                         </div>
                                     </div>
                                 </div>
@@ -64,8 +68,17 @@
                                             <span>
                                                 <img src="{% static 'assets/images/svg/birth-date.svg' %}" alt="png-logo"/>
                                             </span>
-                                            <input class="input-field" type="text" id="birth_date" placeholder="{{ profile.birth_date|date:'m/d/Y' }}" name="birth_date" onfocus="(this.type='date')" onblur="if(!this.value) this.type='text'" />
-                                        </div>
+
+                                            <input
+                                              class="input-field"
+                                              type="text"
+                                              id="birth_date"
+                                              name="birth_date"
+                                              value="{{ profile.birth_date|date:'m/d/Y' }}"
+                                            />
+
+
+                                         </div>
                                     </div>
                                 </div>
 
@@ -77,6 +90,7 @@
                                                 <img src="{% static 'assets/images/svg/gender.svg' %}" alt="png-logo"/>
                                             </span>
                                             <select class="input-field" id="gender" name="gender">
+                                                <option value="" {% if not profile.gender %}selected{% endif %} disabled>Select Gender</option>
                                                 <option value="male" {% if profile.gender == 'male' %}selected{% endif %}>Male</option>
                                                 <option value="female" {% if profile.gender == 'female' %}selected{% endif %}>Female</option>
                                                 <option value="non_binary" {% if profile.gender == 'non_binary' %}selected{% endif %}>Non-Binary</option>
@@ -88,7 +102,7 @@
 
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-wrapper">
-                                        <label class="form-heading" for="ftp">FTP</label>
+                                        <label class="form-heading" for="ftp">FTP (W)</label>
                                         <div class="input-wrap">
                                             <span>
                                                 <img src="{% static 'assets/images/svg/training-stress.svg' %}" alt="png-logo"/>
@@ -100,17 +114,17 @@
 
                                 <div class="col-lg-6 col-md-6">
                                     <div class="form-wrapper">
-                                        <label class="form-heading" for="weight">Weight</label>
+                                        <label class="form-heading" for="weight"><span id="weight-label">Weight{% if profile.metrics_unit %} (kgs){% else %} (lbs){% endif %}</span></label>
                                         <div class="input-wrap">
                                             <span>
                                                 <img src="{% static 'assets/images/svg/weight.svg' %}" alt="png-logo"/>
                                             </span>
-                                            <input 
-                                                class="input-field" 
-                                                type="number" 
+                                            <input
+                                                class="input-field"
+                                                type="number"
                                                 id="weight"
                                                 placeholder="{% if profile.weight %}{{ user_weight }}{% endif %}"
-                                                name="weight" 
+                                                name="weight"
                                             />
                                         </div>
                                     </div>
@@ -147,84 +161,81 @@
                     </form>
 
                                 <div class="col-12 d-flex justify-content-between align-items-center">
-                                    <label for="password" class="d-none d-md-block">Password</label>
+                                    <label for="password" class="d-none d-lg-block">Password</label>
                                     <a href="{% url 'password_change' %}" class="btn btn-theme-profile mx-0 mt-3 w-sm-25" role="button">
                                         Change Password
                                     </a>
                                 </div>
 
-                    
-                                <div class="col-12 d-flex justify-content-between align-items-center">
-                                    <label for="sign_out" class="d-none d-md-block">Sign Out</label>
-                                    <a class="nav-link collapsed" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#signoutModal">
 
-                                        <button type="button" class="btn btn-theme-signout mx-0 mt-3 w-sm-25">
-                                            Sign Out
-                                        </button>
-                                    </a>
+                                <div class="col-12 d-flex justify-content-between align-items-center">
+                                    <label for="sign_out" class="d-none d-lg-block">Sign Out</label>
+                                    <button type="button" class="btn btn-theme-signout mx-0 mt-3 w-sm-25" data-bs-toggle="modal" data-bs-target="#signoutModal">
+                                      Sign Out
+                                    </button>
 
                                     <!-- Modal -->
-                                    <div 
-                                    class="modal fade" 
-                                    id="signoutModal" 
-                                    data-bs-backdrop="static" 
-                                    data-bs-keyboard="false" 
-                                    tabindex="-1" 
-                                    aria-labelledby="signoutModalLabel" 
+                                    <div
+                                    class="modal fade"
+                                    id="signoutModal"
+                                    data-bs-backdrop="static"
+                                    data-bs-keyboard="false"
+                                    tabindex="-1"
+                                    aria-labelledby="signoutModalLabel"
                                     aria-hidden="true"
                                   >
-                                    <div 
-                                      class="modal-dialog modal-dialog-centered" 
+                                    <div
+                                      class="modal-dialog modal-dialog-centered"
                                       style="max-width: 400px; width: 90%;"
                                     >
-                                      <div 
-                                        class="modal-content" 
+                                      <div
+                                        class="modal-content"
                                         style="background-color: #1e1e2d; color: #fff; border-radius: 10px; border: none; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);"
                                       >
-                                        <div 
-                                          class="modal-header" 
+                                        <div
+                                          class="modal-header"
                                           style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333;"
                                         >
-                                          <h5 
-                                            class="modal-title" 
-                                            id="signoutModalLabel" 
+                                          <h5
+                                            class="modal-title"
+                                            id="signoutModalLabel"
                                             style="font-weight: bold; font-size: 18px;"
                                           >
                                             Confirm Logout
                                           </h5>
-                                          <button 
-                                            type="button" 
-                                            class="btn-close" 
-                                            data-bs-dismiss="modal" 
-                                            aria-label="Close" 
+                                          <button
+                                            type="button"
+                                            class="btn-close"
+                                            data-bs-dismiss="modal"
+                                            aria-label="Close"
                                             style="background-color: #555; opacity: 1; width: 20px; height: 20px; border-radius: 50%; color: white;"
                                           ></button>
                                         </div>
-                                        <div 
-                                          class="modal-body" 
+                                        <div
+                                          class="modal-body"
                                           style="padding: 20px; text-align: center;"
                                         >
                                           <p style="font-size: 14px; line-height: 1.6; margin-bottom: 10px;">
                                             Are you sure you want to log out of your account? You’ll need to log in again to access your dashboard.
                                           </p>
                                         </div>
-                                        <div 
-                                          class="modal-footer" 
+                                        <div
+                                          class="modal-footer"
                                           style="display: flex; justify-content: space-between; padding: 15px;"
                                         >
-                                          <button 
-                                            type="button" 
-                                            class="btn btn-secondary" 
-                                            data-bs-dismiss="modal" 
+                                          <button
+                                            type="button"
+                                            class="btn btn-secondary"
+                                            data-bs-dismiss="modal"
                                             style="background-color: #555; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-size: 14px;"
                                           >
                                             Cancel
                                           </button>
                                           <form method="post" action="{% url 'logout' %}">
                                             {% csrf_token %}
-                                            <button 
-                                              class="btn btn-danger" 
-                                              type="submit" 
+                                            <button
+                                              class="btn btn-danger"
+                                              type="submit"
                                               style="background-color: #f44336; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-size: 14px;"
                                             >
                                               Log Out
@@ -234,59 +245,54 @@
                                       </div>
                                     </div>
                                   </div>
-                                  
+
                                 </div>
 
-                                <div class="row col-12 justify-content-between align-items-center pe-0">
-                                    <label for="delete_account" class="d-none d-md-block col-3">Delete Account</label>
-                                    <div class="col-12 col-md-9 d-flex flex-wrap gap-0 gap-md-3 justify-content-end pe-0">
-                                        <a class="nav-link collapsed" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                                <div class="col-12 d-flex justify-content-between align-items-center">
+                                    <label for="delete_account" class="d-none d-lg-block">Delete Account</label>
+                                      <button type="button" class="btn-theme-delete mx-0 w-sm-25 step-btn-next" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                                        Delete Account
+                                      </button>
 
-                                            <button type="button" class="btn-theme-delete mx-0 w-sm-25 step-btn-next">
-                                                Delete Account
-                                            </button>
-                                        </a>
-                                    </div>
-                                    
                                     <!-- Modal -->
-                                    <div 
-                                    class="modal fade" 
-                                    id="deleteAccountModal" 
-                                    data-bs-backdrop="static" 
-                                    data-bs-keyboard="false" 
-                                    tabindex="-1" 
-                                    aria-labelledby="deleteAccountLabel" 
+                                    <div
+                                    class="modal fade"
+                                    id="deleteAccountModal"
+                                    data-bs-backdrop="static"
+                                    data-bs-keyboard="false"
+                                    tabindex="-1"
+                                    aria-labelledby="deleteAccountLabel"
                                     aria-hidden="true"
                                   >
-                                    <div 
-                                      class="modal-dialog modal-dialog-centered" 
+                                    <div
+                                      class="modal-dialog modal-dialog-centered"
                                       style="max-width: 400px; width: 90%;"
                                     >
-                                      <div 
-                                        class="modal-content" 
+                                      <div
+                                        class="modal-content"
                                         style="background-color: #222; color: #fff; border-radius: 10px; border: none;"
                                       >
-                                        <div 
-                                          class="modal-header" 
+                                        <div
+                                          class="modal-header"
                                           style="border-bottom: 1px solid #444; display: flex; justify-content: space-between; align-items: center;"
                                         >
-                                          <h5 
-                                            class="modal-title" 
-                                            id="deleteAccountLabel" 
+                                          <h5
+                                            class="modal-title"
+                                            id="deleteAccountLabel"
                                             style="font-weight: bold;"
                                           >
                                             Confirm Account Deletion
                                           </h5>
-                                          <button 
-                                            type="button" 
-                                            class="btn-close" 
-                                            data-bs-dismiss="modal" 
-                                            aria-label="Close" 
+                                          <button
+                                            type="button"
+                                            class="btn-close"
+                                            data-bs-dismiss="modal"
+                                            aria-label="Close"
                                             style="background-color: #fff; opacity: 1; width: 20px; height: 20px; border-radius: 50%;"
                                           ></button>
                                         </div>
-                                        <div 
-                                          class="modal-body" 
+                                        <div
+                                          class="modal-body"
                                           style="padding: 20px; text-align: center;"
                                         >
                                           <p style="margin-bottom: 15px; font-size: 14px;">
@@ -296,30 +302,24 @@
                                             Warning: This action cannot be reversed!
                                           </p>
                                         </div>
-                                        <div 
-                                          class="modal-footer" 
+                                        <div
+                                          class="modal-footer"
                                           style="display: flex; justify-content: center; gap: 10px; border-top: 1px solid #444; padding: 15px;"
                                         >
-                                          <button 
-                                            type="button" 
-                                            class="btn btn-secondary" 
-                                            data-bs-dismiss="modal" 
+                                          <button
+                                            type="button"
+                                            class="btn btn-secondary"
+                                            data-bs-dismiss="modal"
                                             style="background-color: #555; color: #fff; border: none; padding: 10px 20px; border-radius: 5px;"
                                           >
                                             Cancel
                                           </button>
-                                          <!-- <a 
-                                            href="{% url 'delete_account' %}" 
-                                            class="btn btn-danger" 
-                                            style="background-color: #f44336; color: #fff; border: none; padding: 10px 20px; border-radius: 5px;"
-                                          >
-                                            Delete Account
-                                          </a> -->
+
 
                                           <form method="post" action="{% url 'delete_account' %}">
                                             {% csrf_token %}
-                                            <button 
-                                                class="btn btn-danger" 
+                                            <button
+                                                class="btn btn-danger"
                                                 type="submit"
                                                 style="background-color: #f44336; color: #fff; border: none; padding: 10px 20px; border-radius: 5px;"
                                             >
@@ -330,7 +330,7 @@
                                       </div>
                                     </div>
                                   </div>
-                                  
+
                                 </div>
                 </div>
             </div>

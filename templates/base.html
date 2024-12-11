@@ -3,39 +3,66 @@
 {% load static %}
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>ML Endurance Fueling App</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+
     <link
       rel="stylesheet"
-      href="{% static 'assets/style/main.css' %}?v=1.19"
+      href="{% static 'assets/style/main.css' %}?v=1.5"
       crossorigin="anonymous"
     />
+    <script
+    src="https://kit.fontawesome.com/cc82eb2a33.js"
+    crossorigin="anonymous"
+  ></script>
+
 
     <style>
       .profile_image {
-        width: 100px; 
-        height: 100px; 
+        width: 100px;
+        height: 100px;
         overflow: hidden;
         position: relative;
-        border-radius: 50%; 
+        border-radius: 50%;
+        display: block;
       }
 
       .profile_image img {
         width: 100%;
         height: 100%;
-        object-fit: cover; 
+        object-fit: cover;
       }
+
+      .modal-dialog {
+        margin: auto !important;
+     }
+
+
+        /* Hide the spin buttons in WebKit browsers */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Hide spin buttons in Firefox */
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+
+
+
     </style>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
   </head>
 
   <body>
     <div class="main-container">
-      <!-- sidebar  mobile menu button starts -->
       <button
         class="btn mobile-trigger"
         type="button"
@@ -63,7 +90,6 @@
           </div>
         </div>
       </button>
-      <!-- sidebar  mobile menu button ends -->
 
       <!-- sidebar  mobile menu content starts -->
       <div
@@ -104,8 +130,9 @@
                   <span class="profile-img">
                     <img
                       class="img-fluid"
-                      src="{% if profile.profile_pic %}{{ profile.profile_pic.url }}{% else %}{% static 'assets/images/png/mobile-profile-img.png' %}{% endif %}" 
+                      src="{% if profile.profile_pic %}{{ profile.profile_pic.url }}{% else %}{% static 'assets/images/png/default_profile.png' %}{% endif %}"
                       alt="Profile Image"
+                      id="menu-image-placeholder"
                     />
                   </span>
                   <div class="profile-info">
@@ -125,7 +152,7 @@
                 </a>
               </li>
               <li class="sidebar-list">
-                <a href="{% url 'workout_log' %}"> 
+                <a href="{% url 'workout_log' %}">
                   <img
                     src="{% static 'assets/images/svg/fuel-mobile.svg' %}"
                     alt="mobile-img"
@@ -142,6 +169,26 @@
                   <span class="menu-name">Contact Us</span>
                 </a>
               </li>
+
+              <li class="sidebar-list">
+                <a href="{% url 'terms_and_condition' %}" target="_blank">
+                  <i
+                    class="fa-regular fa-file ps-3 pe-3"
+                    style="font-size: 20px; color: #818be6"
+                  ></i>
+                  <span class="menu-name ps-1">Terms of Use</span>
+                </a>
+              </li>
+              <li class="sidebar-list">
+                <a href="{% url 'privacy_policy' %}" target="_blank">
+                  <i
+                    class="fas fa-shield-alt px-3"
+                    style="font-size: 20px; color: #818be6"
+                  ></i>
+                  <span class="menu-name">Privacy Policy</span>
+                </a>
+              </li>
+
               <li class="sidebar-list">
                 <a href="{% url 'profile' %}">
                   <img
@@ -170,7 +217,7 @@
         </div>
         <div class="sidebar-nav">
           <ul class="main-category-menu">
-            <li 
+            <li
                 {% if '/fuel-planner/' == request.path %}
                     class="sidebar-list active"
                 {% else %}
@@ -217,12 +264,12 @@
                 <span class="menu-name">Fuel Planner</span>
               </a>
             </li>
-            <li 
+            <li
                 {% if '/workout-log/' == request.path %}
                 class="sidebar-list active"
                 {% else %}
                     class="sidebar-list"
-                {% endif %}            
+                {% endif %}
             >
               <a href="{% url 'workout_log' %}">
                 <span class="icon">
@@ -286,12 +333,12 @@
             </li>
           </ul>
           <ul class="main-category-menu">
-            <li 
+            <li
                 {% if '/contact-us/' == request.path %}
                 class="sidebar-list active"
                 {% else %}
                     class="sidebar-list"
-                {% endif %}            
+                {% endif %}
             >
               <a href="{% url 'contact_us' %}">
                 <span class="icon">
@@ -320,12 +367,38 @@
                 <span class="menu-name">Contact Us</span>
               </a>
             </li>
+
+            <li class="sidebar-list">
+              <a href="{% url 'terms_and_condition' %}" target="_blank">
+                <span class="icon">
+                  <i
+                    class="fa-regular fa-file"
+                    style="font-size: 18px; color: #a4a8c7"
+                  ></i>
+                </span>
+                <span class="menu-name">Terms of Use</span>
+              </a>
+            </li>
+            <li class="sidebar-list">
+              <a href="{% url 'privacy_policy' %}" target="_blank">
+                <span class="icon">
+                  <i
+                    class="fas fa-shield-alt"
+                    style="font-size: 18px; color: #a4a8c7"
+                  ></i>
+                </span>
+                <span class="menu-name">Privacy Policy</span>
+              </a>
+            </li>
+
+
+
             <!-- Profile Section -->
             <li class="profile-card">
               <a href="{% url 'profile' %}">
                 <span class="profile-img">
                   <img
-                    src="{% if profile.profile_pic %}{{ profile.profile_pic.url }}{% else %}{% static 'assets/images/png/profile-img.png' %}{% endif %}"
+                    src="{% if profile.profile_pic %}{{ profile.profile_pic.url }}{% else %}{% static 'assets/images/png/default_profile.png' %}{% endif %}"
                     alt="Profile Image"
                   />
                 </span>
@@ -335,15 +408,15 @@
                 </div>
               </a>
             </li>
-            
+
           </ul>
         </div>
       </div>
       <!-- sidebar Desktop ends -->
 
 
-        
-        
+
+
 
         <div class="main-content-container">
             {% if messages %}
@@ -354,23 +427,27 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             </div>
-            
-            {% endfor %} 
+
+            {% endfor %}
             {% endif %}
-            
+
             {% block content %}
             {% endblock content %}
         </div>
+
+
     </div>
   </body>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="{% static 'assets/scripts/my.js' %}?v=1.247"></script>
-  <script src="{% static 'assets/scripts/changepassword.js' %}?v=1.0"></script>
-  <!-- <script src="{% static 'assets/scripts/chart.js' %}?v=1.02"></script> -->
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="{% static 'assets/scripts/my.js' %}?v=1.5"></script>
+  <script src="{% static 'assets/scripts/changepassword.js' %}?v=1.0"></script>
+
+
   {% block js_scripts %}
   {% endblock js_scripts %}
 </html>

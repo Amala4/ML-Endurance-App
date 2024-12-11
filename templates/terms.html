@@ -1,0 +1,100 @@
+{% load static %}
+
+<style>
+  body {
+    background-color: #121212;
+    color: rgb(224, 220, 249);
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+
+  .col-md-9 {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #1e1e1e;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  h1, h2, h3, h4 {
+    color: #ffffff;
+    margin-bottom: 20px;
+  }
+
+  p, ul, ol {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  a {
+    color: #2f388d;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  .btn {
+    background-color: #2f388d;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+
+  .btn:hover {
+    background-color: #1e2a6b;
+  }
+
+  .terms-content {
+    margin-top: 20px;
+  }
+
+  .terms-content h2 {
+    font-size: 22px;
+    margin-bottom: 15px;
+  }
+
+  .terms-content ul {
+    padding-left: 20px;
+  }
+
+  .footer {
+    background-color: #1e1e1e;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    font-size: 14px;
+  }
+
+  @media (max-width: 768px) {
+    .col-md-9 {
+      padding: 15px;
+      margin: 10px;
+    }
+  }
+</style>
+
+<div class="col-md-9">
+    <div class="terms-content">
+        {% autoescape off %} {{ content }} {% endautoescape %}
+    </div>
+</div>
+
+<div class="footer">
+    &copy; <span id="current-year"></span> ML Endurance Fueling App. All rights reserved.
+</div>
+
+<script>
+  document.getElementById('current-year').textContent = new Date().getFullYear();
+</script>

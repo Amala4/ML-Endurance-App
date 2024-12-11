@@ -3,7 +3,6 @@
 {% load custom_filters %}
 
 {% block content %}
-    <!-- fuel planner detail  -->
     <div class="container">
       <div class="row">
         <div class="col">
@@ -77,14 +76,14 @@
 
               <!-- Data temp storage -->
               <h6 id="workout_log_url" style="display: none;" data-workout_log_url="{% url 'workout_log' %}"></h6>
+              <h6 id="check_workout_log_url" style="display: none;" data-check_workout_log_url="{% url 'check_workout_log' %}"></h6>
               <h6 id="chart_url" style="display: none;" data-chart_url="{% url 'chart_url' %}"></h6>
 
-              
+
               <!-- Alert Message -->
-              <div id="alert-message" style="visibility: hidden; text-align: center; margin: 0px; max-width: 60%; height: 30px; background-color: #812e2e; color: #fff; border-radius: 8px; line-height: 30px; font-size: 14px; font-weight: bold; position: relative; overflow: hidden;">
-                <span id="message-text" style="display: inline;">Please fill in all the required fields.</span>
-               <button id="close-message" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #fff; font-size: 18px; font-weight: bold; cursor: pointer;">×</button>
-             </div>
+              <div id="alert-message" style="display:none; text-align: center; padding:5px; margin: 0px; min-width: 80%; background-color: #812e2e; color: #fff; border-radius: 8px; line-height: 30px; font-size: 14px; font-weight: bold; position: relative;">
+                <span id="message-text" style="display: inline;"></span>
+              </div>
 
               <form>
                 {% csrf_token %}
@@ -112,7 +111,7 @@
                           </div>
                           <div class="form-data-content">
                             <h5 class="form-data-heading">Sport</h5>
-                            <h3 class="form-data-detail">{{ latest_workout.sport|default:"No workout entered yet" }}</h3>
+                            <h3 class="form-data-detail">{{ latest_workout.get_sport_display|default:"No workout entered yet" }}</h3>
                           </div>
                           <div class="form-data-content">
                             <h5 class="form-data-heading">Planned Date</h5>
@@ -122,24 +121,29 @@
                             <h5 class="form-data-heading">Duration</h5>
                             <h3 class="form-data-detail">{{ latest_workout.duration|format_duration|default:"No workout entered yet" }}</h3>
                           </div>
+                          {% if latest_workout.tss %}
                           <div class="form-data-content">
                             <h5 class="form-data-heading">
                               Training Stress Score
                             </h5>
                             <h3 class="form-data-detail">{{ latest_workout.tss|default:"No workout entered yet" }}</h3>
                           </div>
+                          {% endif %}
+
+                          {% if latest_workout.intensity_factor %}
                           <div class="form-data-content">
                             <h5 class="form-data-heading">
                               Intensity Factor
                             </h5>
                             <h3 class="form-data-detail">{{ latest_workout.intensity_factor|default:"No workout entered yet" }}</h3>
                           </div>
+                          {% endif %}
                         </div>
                       </div>
                     </div>
                     <div class="col-lg-6 col-md-6">
                       <div class="workout-form">
-                        <label class="d-md-none mt-4" for=""
+                        <label class="d-lg-none mt-4" for=""
                           >Workout Details
                         </label>
                         <div class="form-wrapper">
@@ -157,9 +161,7 @@
                               class="input-field"
                               type="text"
                               placeholder="Date"
-                              onfocus="(this.type='date')"
-                              onblur="if(!this.value) this.type='text'"
-                              id="workout_date" 
+                              id="workout_date"
                               name="workout_date"
                             />
                           </div>
@@ -176,25 +178,26 @@
                               />
                             </span>
                             <input
-                              type="number"
+                              type="text"
                               min="0"
                               class="form-control mobile-text1"
                               aria-label="Hours"
                               placeholder="Hours"
-                              id="duration_hours" 
+                              id="duration_hours"
                               name="duration_hours"
                             />
                             <input
-                              type="number"
+                              type="text"
                               min="0"
                               class="form-control mobile-text2"
                               aria-label="Minutes"
                               placeholder="Minutes"
-                              id="duration_minutes" 
+                              id="duration_minutes"
                               name="duration_minutes"
                             />
                           </div>
                         </div>
+                        {% if latest_workout.tss %}
                         <div class="form-wrapper">
                           <label class="form-heading" for=""
                             >Training Stress Score
@@ -208,15 +211,17 @@
                             </span>
                             <input
                               class="input-field"
-                              type="number"
+                              type="text"
                               min="0"
                               max="10000"
                               placeholder="Training Stress Score"
-                              id="training_stress" 
+                              id="training_stress"
                               name="training_stress"
                             />
                           </div>
                         </div>
+                        {% endif %}
+
                         <div class="form-wrapper">
                           <label class="form-heading" for=""
                             >Enter amount of work in calories</label
@@ -225,17 +230,17 @@
                             <span>
                               <img
                                 src="{% static 'assets/images/svg/calories.svg' %}"
-                                
+
                                 alt="png-logo"
                               />
                             </span>
                             <input
                               class="input-field"
-                              type="number"
+                              type="text"
                               min="0"
                               max="10000"
                               placeholder="Enter calories"
-                              id="calories" 
+                              id="calories"
                               name="calories"
                             />
                           </div>
@@ -243,7 +248,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="w-100 d-md-flex justify-content-end">
+                  <div class="w-100 d-lg-flex justify-content-end">
                     <button
                       type="button"
                       id="workout_log_details"
@@ -258,62 +263,63 @@
                 <div class="form-step" data-step="2">
                   <div class="fuel_log-wrapper">
                     <div class="form-wrapper">
-                      <label class="d-none d-md-block" for=""
-                        >Total carbohydrates consumed
+                      <label class="d-none d-lg-block" for=""
+                        >Total carbohydrates (in grams) consumed
                       </label>
-                      <label class="d-md-none d-sm-block" for=""
+                      <label class="d-lg-none d-sm-block" for=""
                         >Carbohydrates Consumed
                       </label>
                       <div class="input-wrap">
                         <input
                           class="input-field placeholder-responsive1"
-                          type="number"
-                          min="0" 
+                          type="text"
+                          min="0"
                           placeholder="Enter number of carbohydrates..."
-                          id="carbs_consumed" 
+                          id="carbs_consumed"
                           name="carbs_consumed"
                         />
                       </div>
                     </div>
                     <div class="form-wrapper">
-                      <label class="d-none d-md-block" for=""
-                        >Volume of water (in milliliters) consumed
+                      <label class="d-none d-lg-block" for=""
+                        >Volume of water (in {{water_unit}}) consumed
                       </label>
-                      <label class="d-md-none d-sm-block" for=""
+                      <label class="d-lg-none d-sm-block" for=""
                         >Water Consumed
                       </label>
                       <div class="input-wrap">
                         <input
                           class="input-field placeholder-responsive2"
-                          type="number"
-                          min="0" 
+                          type="text"
+                          min="0"
                           placeholder="Enter volume of water..."
-                          id="water_consumed" 
+                          id="water_consumed"
                           name="water_consumed"
+                          data-water-unit="{{water_unit}}"
                         />
                       </div>
                     </div>
                     <div class="form-wrapper">
-                      <label class="d-none d-md-block" for=""
+                      <label class="d-none d-lg-block" for=""
                         >Amount of sodium (in milligrams) consumed
                       </label>
-                      <label class="d-md-none d-sm-block" for=""
+                      <label class="d-lg-none d-sm-block" for=""
                         >Sodium Consumed
                       </label>
                       <div class="input-wrap">
                         <input
                           class="input-field placeholder-responsive3"
-                          type="number"
-                          min="0" 
+                          type="text"
+                          min="0"
                           max="3000"
                           placeholder="Enter amount of sodium..."
-                          id="sodium_consumed" 
+                          id="sodium_consumed"
                           name="sodium_consumed"
                         />
                       </div>
                     </div>
                   </div>
-                  <div class="w-100 d-md-flex justify-content-between mt-5">
+                  <div class="w-100 d-lg-flex justify-content-between mt-5">
                     <button
                       type="button"
                       class="btn-theme-transparent mt-2 w-25 step-btn-prev"
@@ -342,7 +348,6 @@
                           id="cold"
                           name="weather"
                           value="cold"
-                          checked
                         />
                         <label class="input-field-radio" for="cold"
                           >Cold</label
@@ -360,12 +365,13 @@
 
                         <input
                           type="radio"
-                          id="warm"
+                          id="neutral"
                           name="weather"
-                          value="warm"
+                          value="neutral"
+                          checked
                         />
-                        <label class="input-field-radio" for="warm"
-                          >Warm</label
+                        <label class="input-field-radio" for="neutral"
+                          >Neutral</label
                         >
 
                         <input
@@ -398,8 +404,8 @@
                         </div>
                         <div class="toggle-switch">
                           <label class="switch">
-                            <input 
-                              type="checkbox" 
+                            <input
+                              type="checkbox"
                               id="indoor_workout"
                               name="indoor_workout"
                             />
@@ -409,7 +415,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="w-100 d-md-flex justify-content-between">
+                  <div class="w-100 d-lg-flex justify-content-between">
                     <button
                       type="button"
                       class="btn-theme-transparent mt-2 w-25 step-btn-prev"
@@ -440,6 +446,7 @@
                           id="gastro-none"
                           name="gastro"
                           value="0"
+                          checked
                         />
                         <label class="input-field-radio" for="gastro-none"
                           >None</label
@@ -476,6 +483,7 @@
                           id="muscle-none"
                           name="muscle"
                           value="0"
+                          checked
                         />
                         <label class="input-field-radio" for="muscle-none"
                           >None</label
@@ -513,6 +521,7 @@
                           id="bonking-none"
                           name="bonking"
                           value="0"
+                          checked
                         />
                         <label class="input-field-radio" for="bonking-none"
                           >None</label
@@ -540,7 +549,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="w-100 d-md-flex justify-content-between">
+                  <div class="w-100 d-lg-flex justify-content-between">
                     <button
                       type="button"
                       class="btn-theme-transparent mt-2 w-25 step-btn-prev"
@@ -577,7 +586,7 @@
                           data.
                         </p>
                       </div>
-                      <div class="w-100 d-md-flex justify-content-center">
+                      <div class="w-100 d-lg-flex justify-content-center">
                         <button
                           type="button"
                           id="workout_log_thank_you"
@@ -603,17 +612,92 @@
                   <div class="recived-cards">
                     <canvas id="myChart"></canvas>
                   </div>
-                  
+
                 </div>
-                <div class="w-100 d-md-flex justify-content-end">
+                <div class="w-100 d-lg-flex justify-content-end">
                   <a href="{% url 'index' %}">
                     <button type="button" class="btn-theme-dark mt-2 w-25">
                     Home
                     </button>
                   </a>
-                  
+
                 </div>
               </div>
+
+
+              <!-- Modal -->
+              <div
+                class="modal fade"
+                id="confirmLogUpdateModal"
+                data-bs-backdrop="static"
+                data-bs-keyboard="false"
+                tabindex="-1"
+                aria-labelledby="workoutLogModalLabel"
+                aria-hidden="true"
+              >
+                <div
+                  class="modal-dialog modal-dialog-centered"
+                  style="max-width: 400px; width: 90%;"
+                >
+                  <div
+                    class="modal-content"
+                    style="background-color: #1e1e2d; color: #fff; border-radius: 10px; border: none; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);"
+                  >
+                    <div
+                      class="modal-header"
+                      style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333;"
+                    >
+                      <h5
+                        class="modal-title"
+                        id="workoutLogModalLabel"
+                        style="font-weight: bold; font-size: 18px;"
+                      >
+                        Workout Log Exists!
+                      </h5>
+                      <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                        style="background-color: #555; opacity: 1; width: 20px; height: 20px; border-radius: 50%; color: white;"
+                      ></button>
+                    </div>
+                    <div
+                      class="modal-body"
+                      style="padding: 20px; text-align: center;"
+                    >
+                      <p style="font-size: 14px; line-height: 1.6; margin-bottom: 10px;">
+                        A workout log already exists for this workout, Do you wish to update it?
+                      </p>
+                    </div>
+                    <div
+                      class="modal-footer"
+                      style="display: flex; justify-content: space-between; padding: 15px;"
+                    >
+                      <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                        style="background-color: #555; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-size: 14px;"
+                      >
+                        Cancel
+                      </button>
+
+                      <button
+                        class="btn btn-danger"
+                        id="workoutUpdateConfirm"
+                        type="submit"
+                        style="background-color: #f44336; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-size: 14px;"
+                      >
+                        Yes
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+
             </div>
           </div>
         </div>

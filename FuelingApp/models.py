@@ -6,7 +6,7 @@ CustomUser = get_user_model()
 WEATHER_CONDITION_CHOICES = [
     ('cold', 'Cold'),
     ('cool', 'Cool'),
-    ('warm', 'Warm'),
+    ('neutral', 'Neutral'),
     ('hot', 'Hot'),
     ('very_hot', 'Very Hot'),
 ]
@@ -40,7 +40,7 @@ class Workout(models.Model):
             return f"{self.name} workout"
         return self.user.email
 
-    
+
 
 
 class FuelingPlan(models.Model):
@@ -61,19 +61,6 @@ class FuelingPlan(models.Model):
 
 
 
-# class CyclingWorkoutDetails(models.Model):
-#     workout = models.OneToOneField(Workout, on_delete=models.CASCADE, related_name='workout_details')
-#     intensity_factor = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(2)], null=True, blank=True)
-#     tss = models.PositiveIntegerField("Training Stress Score", validators=[MaxValueValidator(10000)], null=True, blank=True,)
-#     date_added = models.DateTimeField(auto_now_add=True, )
-
-#     def __str__(self):
-#         if self.workout.name:
-#             return self.workout.name
-#         return self.workout.user.email
-
-
-
 class WorkoutLog(models.Model):
     workout = models.OneToOneField(Workout, on_delete=models.CASCADE, related_name='workout_log')
     duration = models.PositiveIntegerField("Duration in Minutes", null=True, blank=True)
@@ -87,18 +74,6 @@ class WorkoutLog(models.Model):
             return f"{self.workout.name} workout"
         return self.workout.user.email
 
-
-
-# class CyclingWorkoutLog(models.Model):
-#     workout_log = models.OneToOneField(WorkoutLog, on_delete=models.CASCADE, related_name='cycling_workout_log')
-#     intensity_factor = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(2)], null=True, blank=True)
-#     tss = models.PositiveIntegerField("Training Stress Score", validators=[MaxValueValidator(10000)], null=True, blank=True,)
-#     date_added = models.DateTimeField(auto_now_add=True, )
-
-#     def __str__(self):
-#         if self.workout_log.workout.name:
-#             return self.workout_log.workout.name
-#         return self.workout_log.workout.user.email
 
 
 
@@ -128,7 +103,7 @@ class WorkoutCondition(models.Model):
 
     def __str__(self):
         if self.workout_log.workout.name:
-            return f"{self.workout_log.workout.name} workout log" 
+            return f"{self.workout_log.workout.name} workout log"
         return self.workout_log.workout.user.email
 
 
@@ -136,9 +111,9 @@ class WorkoutCondition(models.Model):
 
 class FuelingIssue(models.Model):
     workout_log = models.OneToOneField(WorkoutLog, on_delete=models.CASCADE, related_name='fueling_issues')
-    bloating_gi = models.PositiveIntegerField("Bloating (GI)", validators=[MaxValueValidator(10)], choices=ISSUES_CHOICES, null=True, blank=True,)
-    cramping = models.PositiveIntegerField("Cramping", validators=[MaxValueValidator(10)], choices=ISSUES_CHOICES, null=True, blank=True,)
-    bonking = models.PositiveIntegerField("Bonking", validators=[MaxValueValidator(10)], choices=ISSUES_CHOICES, null=True, blank=True,)   
+    bloating_gi = models.PositiveIntegerField("Bloating (GI)", validators=[MaxValueValidator(10)], choices=ISSUES_CHOICES, null=True, blank=True, default=0)
+    cramping = models.PositiveIntegerField("Cramping", validators=[MaxValueValidator(10)], choices=ISSUES_CHOICES, null=True, blank=True, default=0)
+    bonking = models.PositiveIntegerField("Bonking", validators=[MaxValueValidator(10)], choices=ISSUES_CHOICES, null=True, blank=True, default=0)
     date_added = models.DateTimeField(auto_now_add=True, )
 
     class Meta:

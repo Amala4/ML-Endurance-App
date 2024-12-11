@@ -2,9 +2,7 @@ from django.contrib import admin
 from .models import (
     Support,
     Workout,
-    # CyclingWorkoutDetails,
     WorkoutLog,
-    # CyclingWorkoutLog,
     WorkoutFuelLog,
     WorkoutCondition,
     FuelingIssue,
@@ -25,35 +23,12 @@ admin.site.register(Workout, WorkoutAdmin)
 
 
 
-# CyclingWorkoutDetails admin set up
-# class CyclingWorkoutDetailsAdmin(admin.ModelAdmin):
-#     list_display = ('workout', 'intensity_factor', 'tss', 'date_added')
-#     list_display_links = ('workout', 'intensity_factor', 'tss', 'date_added')
-#     readonly_fields = ('workout', 'date_added')
-#     search_fields = ('workout__user__email', 'workout__name')
-# admin.site.register(CyclingWorkoutDetails, CyclingWorkoutDetailsAdmin)
-
-
-
-
 # WorkoutLog admin set up
 class WorkoutLogAdmin(admin.ModelAdmin):
     list_display = ('workout', 'duration', 'calories', 'date')
     list_display_links = ('workout', 'duration', 'calories', 'date')
-    readonly_fields = ('workout',)
     search_fields = ('workout__user__email', 'workout__name')
 admin.site.register(WorkoutLog, WorkoutLogAdmin)
-
-
-
-
-# CyclingWorkoutLog admin set up
-# class CyclingWorkoutLogAdmin(admin.ModelAdmin):
-#     list_display = ('workout_log', 'intensity_factor', 'tss', 'date_added')
-#     list_display_links = ('workout_log', 'intensity_factor', 'tss', 'date_added')
-#     readonly_fields = ('workout_log', 'date_added')
-#     search_fields = ('workout_log__workout__user__email', 'workout_log__workout__name')
-# admin.site.register(CyclingWorkoutLog, CyclingWorkoutLogAdmin)
 
 
 
@@ -62,7 +37,7 @@ admin.site.register(WorkoutLog, WorkoutLogAdmin)
 class WorkoutFuelLogAdmin(admin.ModelAdmin):
     list_display = ('workout_log', 'water', 'sodium', 'carbs', 'date_added')
     list_display_links = ('workout_log', 'water', 'sodium', 'carbs', 'date_added')
-    readonly_fields = ('workout_log', 'date_added')
+    readonly_fields = ('date_added',)
     search_fields = ('workout_log__workout__user__email', 'workout_log__workout__name')
 admin.site.register(WorkoutFuelLog, WorkoutFuelLogAdmin)
 
@@ -73,7 +48,7 @@ admin.site.register(WorkoutFuelLog, WorkoutFuelLogAdmin)
 class WorkoutConditionAdmin(admin.ModelAdmin):
     list_display = ('workout_log', 'weather_condition', 'isIndoors', 'date_added')
     list_display_links = ('workout_log', 'weather_condition', 'isIndoors', 'date_added')
-    readonly_fields = ('workout_log', 'date_added')
+    readonly_fields = ('date_added',)
     search_fields = ('workout_log__workout__user__email', 'workout_log__workout__name')
 admin.site.register(WorkoutCondition, WorkoutConditionAdmin)
 
@@ -84,7 +59,7 @@ admin.site.register(WorkoutCondition, WorkoutConditionAdmin)
 class FuelingIssuesAdmin(admin.ModelAdmin):
     list_display = ('workout_log', 'bloating_gi', 'cramping', 'bonking', 'date_added')
     list_display_links = ('workout_log', 'bloating_gi', 'cramping', 'bonking', 'date_added')
-    readonly_fields = ('workout_log', 'date_added')
+    readonly_fields = ('date_added',)
     search_fields = ('workout_log__workout__user__email', 'workout_log__workout__name')
 admin.site.register(FuelingIssue, FuelingIssuesAdmin)
 
@@ -95,7 +70,7 @@ admin.site.register(FuelingIssue, FuelingIssuesAdmin)
 class FuelingPlanAdmin(admin.ModelAdmin):
     list_display = ('workout', 'water', 'sodium', 'carbs', 'date_added')
     list_display_links = ('workout', 'water', 'sodium', 'carbs', 'date_added')
-    readonly_fields = ('workout', 'date_added')
+    readonly_fields = ('date_added',)
     search_fields = ('workout__user__email', 'workout__name')
 admin.site.register(FuelingPlan, FuelingPlanAdmin)
 
